@@ -66,9 +66,24 @@ function createMenu() {
  *  ipcMain 主进程向渲染进程发送消息
  *  自定义边框 注册最小化，最大化以及关闭
  */
-ipcMain.on('min', e => mainWindow.minimize());
-ipcMain.on('max', e => mainWindow.maximize());
-ipcMain.on('close', e => mainWindow.minimize());
+//登录窗口最小化
+ipcMain.on('min', function() {
+        mainWindow.minimize();
+    })
+    //登录窗口最大化
+ipcMain.on('max', function(e) {
+    console.log('..', mainWindow.isMaximized())
+    if (mainWindow.isMaximized()) {
+        console.log('hhh')
+        mainWindow.restore();
+    } else {
+        console.log('hdasda')
+        mainWindow.maximize();
+    }
+})
+ipcMain.on('close', function() {
+    mainWindow.close();
+})
 
 app.on('ready', createWindow)
 

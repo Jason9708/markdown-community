@@ -1,178 +1,142 @@
-.plain-login {
-    background: #fff;
-    padding: 20px 30px 9px 30px;
-    background-color: rgba(0, 0, 0, 0.4);
-    position: relative;
-    /deep/ .el-input__inner {
-        height: 30px;
-        background-color: rgba(0, 0, 0, 0.1);
-        color: #fff;
-        font-size: $theme-font-size;
-        border-radius: 1px;
-    }
-    /deep/ .el-input__inner:focus {
-        border-color: #90F790;
-    }
-    /deep/ .el-form-item__label {
-        font-size: $theme-font-size;
-    }
-    /deep/ .el-form-item__content {
+// 引入iconfont
+@import '@/iconfont.scss';
+.icon-wechat-logo:before {
+    color: #2ecc71;
+    content: '\e73b';
+    cursor: pointer;
+}
+
+.plain-login-container {
+    display: flex;
+    .plain-login {
         display: flex;
+        padding: 20px 30px 9px 30px;
+        background-color: rgba(0, 0, 0, 0.4);
+        position: relative;
+        /deep/ .el-input__inner {
+            height: 30px;
+            background-color: rgba(0, 0, 0, 0.1);
+            color: #fff;
+            font-size: $theme-font-size;
+            border-radius: 1px;
+        }
+        /deep/ .el-input__inner:focus {
+            border-color: #90F790;
+        }
+        /deep/ .el-form-item__label {
+            font-size: $theme-font-size;
+        }
+        /deep/ .el-form-item__content {
+            display: flex;
+        }
+        /deep/ .el-input-group__append {
+            background: linear-gradient(to right, #FF416C, #FF4B2B);
+            border-radius: 0px;
+            border-image: linear-gradient(to right, #FF416C, #FF4B2B);
+            padding: 0 10px;
+            font-size: $theme-font-size;
+            color: #fff;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: all .3s linear;
+        }
+        /deep/ .el-input-group__append:hover {
+            opacity: 1;
+        }
     }
-    /deep/ .el-input-group__append {
-        background: linear-gradient(to right, #FF416C, #FF4B2B);
-        border-radius: 0px;
-        border-image: linear-gradient(to right, #FF416C, #FF4B2B);
-        padding: 0 10px;
-        font-size: $theme-font-size;
-        color: #fff;
-        cursor: pointer;
-        transition: all .4s linear;
+    .plain-login::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        border: 2px solid #e74c3c;
+        clip: rect(0px, 2px, 426px, 0px);
+        animation: borderAround1 3s linear;
     }
-    /deep/ .el-input-group__append:hover {
-        opacity: 0.7;
+    @keyframes borderAround1 {
+        0% {
+            clip: rect(0px, 2px, 0px, 0px);
+        }
+        100% {
+            clip: rect(0px, 2px, 426px, 0px);
+        }
+    }
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 30px;
+        .btn-items {
+            flex: 1;
+            display: flex;
+            width: 10px;
+            justify-content: center;
+            align-items: center;
+            font-size: $theme-font-size;
+            padding: 20px 10px;
+            color: #fff;
+        }
+        .login-btn {
+            background: linear-gradient(to bottom, #11998e, #38ef7d);
+            border-radius: 0px 5px 0px 0px;
+            opacity: 0.7;
+            transition: all .3s ease;
+        }
+        .login-btn:hover {
+            opacity: 1;
+            margin-left: 5px;
+        }
+        .register-btn {
+            background: linear-gradient(to top, #FF416C, #FF4B2B);
+            border-radius: 0px 0px 5px 0px;
+            opacity: 0.7;
+            transition: all .3s ease;
+        }
+        .register-btn:hover {
+            opacity: 1;
+            margin-left: 5px;
+        }
     }
 }
 
-.plain-login::before {
+.special-login-container {
+    margin-top: 20px;
+    padding: 10px 0px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    background-color: rgba(0, 0, 0, 0.4);
+    font-size: $theme-font-size;
+    color: #606266;
+    .left {
+        margin-left: 20px;
+    }
+    .right {
+        margin-right: 20px;
+    }
+}
+
+.special-login-container::before {
     content: '';
     position: absolute;
     left: 0;
     top: 0;
     right: 0;
     bottom: 0;
-    border: 1px solid #F56C6C;
-    clip: rect(0px, 0.5px, 345px, 0px);
-    animation: borderAround 3s linear;
+    border: 2px solid #e74c3c;
+    clip: rect(0px, 2px, 40px, 0px);
+    animation: borderAround2 2s linear;
 }
 
-@keyframes borderAround {
+@keyframes borderAround2 {
     0% {
-        clip: rect(0px, 0.5px, 0px, 0px);
+        clip: rect(0px, 2px, 0px, 0px);
     }
     100% {
-        clip: rect(0px, 0.5px, 345px, 0px);
-    }
-}
-
-// ---------------------------------------------
-.button-group {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-    font-size: $theme-font-size;
-}
-
-.button-items1 {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #00995C;
-    border: 1px solid #00995C;
-    color: #fff;
-    padding: 10px 40px;
-    position: relative;
-    transition: all 1s ease;
-    cursor: pointer;
-    .topLine {
-        position: absolute;
-        top: -1px;
-        left: 0px;
-        height: 0px;
-        width: 0px;
-        background: #00995C;
-        animation: topLineAnimation 2s ease;
-    }
-    .rightLine {
-        position: absolute;
-        top: 0px;
-        right: -1px;
-        height: 0px;
-        width: 0px;
-        background: #00995C;
-        animation: rightLineAnimation 2s ease;
-    }
-    .leftLine {
-        position: absolute;
-        bottom: 0px;
-        left: -1px;
-        height: 0px;
-        width: 0px;
-        background: #00995C;
-        animation: leftLineAnimation 2s ease;
-    }
-    .bottomLine {
-        position: absolute;
-        bottom: -1px;
-        right: 0px;
-        height: 0px;
-        width: 0px;
-        background: #00995C;
-        animation: bottomLineAnimation 2s ease;
-    }
-}
-
-.button-items:hover {
-    background: #007747;
-    border: 1px solid #007747;
-}
-
-@keyframes topLineAnimation {
-    0% {
-        top: -1px;
-        left: -100px;
-        height: 1px;
-        width: 40px;
-    }
-    100% {
-        top: -1px;
-        left: 0px;
-        height: 1px;
-        width: 40px;
-    }
-}
-
-@keyframes rightLineAnimation {
-    0% {
-        top: -100px;
-        right: -1px;
-        height: 30px;
-        width: 1px;
-    }
-    100% {
-        top: 0px;
-        right: -1px;
-        height: 30px;
-        width: 1px;
-    }
-}
-
-@keyframes leftLineAnimation {
-    0% {
-        bottom: -100px;
-        left: -1px;
-        height: 30px;
-        width: 1px;
-    }
-    100% {
-        bottom: 0px;
-        left: -1px;
-        height: 30px;
-        width: 1px;
-    }
-}
-
-@keyframes bottomLineAnimation {
-    0% {
-        bottom: -1px;
-        right: -100px;
-        height: 1px;
-        width: 40px;
-    }
-    100% {
-        bottom: -1px;
-        right: 0px;
-        height: 1px;
-        width: 40px;
+        clip: rect(0px, 2px, 40px, 0px);
     }
 }
