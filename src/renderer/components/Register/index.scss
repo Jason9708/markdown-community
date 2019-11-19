@@ -63,4 +63,36 @@
                 clip: rect(0px, 2px, 426px, 0px);
             }
         }
+        // -------btn------
+        .btn-group {
+            margin-top: 10px;
+            display: flex;
+            .btn-items {
+                flex: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 5px 0px;
+                font-size: $theme-font-size;
+                color: #fff;
+                border-radius: 3px;
+                cursor: pointer;
+            }
+            .register-btn {
+                background: linear-gradient(to right, #11998e, #38ef7d);
+                opacity: 0.7;
+                transition: all .3s ease;
+            }
+            .register-btn:hover {
+                opacity: 1;
+            }
+            .login-btn {
+                background: linear-gradient(to left, #FF416C, #FF4B2B);
+                opacity: 0.7;
+                transition: all .3s ease;
+            }
+            .login-btn:hover {
+                opacity: 1;
+            }
+        }
     }

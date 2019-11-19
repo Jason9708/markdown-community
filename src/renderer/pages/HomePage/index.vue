@@ -8,7 +8,7 @@
                 <login-component v-if='showLogin' @displayRegister='displayRegister'></login-component>
             </transition>
             <transition name='register-fade'>
-                <register-component v-if='showRegister'></register-component>
+                <register-component v-if='showRegister' @displayLogin='displayLogin'></register-component>
             </transition>
         </div>
     </div>
@@ -35,6 +35,12 @@ export default {
             this.showLogin = false;
             setTimeout( () => {
                 this.showRegister = true
+            },500)
+        },
+        displayLogin:function(){
+            this.showRegister = false;
+            setTimeout( () => {
+                this.showLogin = true
             },500)
         }
     }

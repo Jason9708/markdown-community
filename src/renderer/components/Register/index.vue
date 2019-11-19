@@ -1,7 +1,7 @@
 <template>
     <div class='register-wrapper'>
         <div class='register-container'>
-            <el-form label-position='right' :model="RegisterForm" :rules="registerRules" ref="registerForm" label-width="100px" class="register-ruleForm">
+            <el-form label-position='right' :model="registerForm" :rules="registerRules" ref="registerForm" label-width="100px" class="register-ruleForm">
                 <el-form-item label="用户名" prop="userName">
                     <el-input v-model="registerForm.userName"></el-input>
                 </el-form-item>
@@ -17,6 +17,14 @@
                     </el-input>
                 </el-form-item>
             </el-form>
+        </div>
+        <div class='btn-group'>
+            <div class='btn-items register-btn' style='margin-right:5px;'>
+                注册
+            </div>
+            <div class='btn-items login-btn' style='margin-left:5px' @click='displayLogin'>
+                已有账号
+            </div>
         </div>
     </div>
 </template>

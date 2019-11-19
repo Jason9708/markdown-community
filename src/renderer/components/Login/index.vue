@@ -37,7 +37,6 @@
 </template>
 
 <script>
-import './index.js'
 export default {
     name:'LoginComponent',
     data(){
