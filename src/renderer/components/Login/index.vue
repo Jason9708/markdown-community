@@ -3,8 +3,8 @@
         <div class='plain-login-container'>
             <div class='plain-login'>
                 <el-form label-position='right' :model="loginForm" :rules="loginRules" ref="loginForm" label-width="100px" class="login-ruleForm">
-                    <el-form-item label="手机号或邮箱" prop="userName">
-                        <el-input v-model="loginForm.userName"></el-input>
+                    <el-form-item label="手机号或邮箱" prop="account">
+                        <el-input v-model="loginForm.account"></el-input>
                     </el-form-item>
                     <el-form-item label="密码" prop="password">
                         <el-input v-model="loginForm.password" show-password></el-input>
@@ -20,7 +20,7 @@
                 <div class='btn-items login-btn'>
                     登录
                 </div>
-                <div class='btn-items register-btn'>
+                <div class='btn-items register-btn' @click='displayRegister'>
                     注册
                 </div>
             </div>
@@ -43,13 +43,13 @@ export default {
     data(){
         return{
             loginForm:{
-                userName:'',
+                account:'',
                 password:'',
                 verifyCode:'',
             },
             loginRules:{
-                userName:[
-                    { required:true,message:'请输入用户名',tigger:'blur' }
+                account:[
+                    { required:true,message:'请输入账号',tigger:'blur' }
                 ],
                 password:[
                     { required:true,message:'请输入密码',tigger:'blur' }
@@ -58,6 +58,11 @@ export default {
                     { required:true,message:'请输入验证码',tigger:'blur' }
                 ]
             }
+        }
+    },
+    methods:{
+        displayRegister:function(){
+            this.$emit('displayRegister')
         }
     }
 }

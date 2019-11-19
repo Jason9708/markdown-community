@@ -21,8 +21,8 @@ function createWindow() {
             height: 800,
             width: 1100,
             frame: false, //是否显示窗口边框
-            resizable: false, //可否缩放
-            movable: false, //可否移动
+            resizable: true, //可否缩放
+            movable: true, //可否移动
             icon: `${__static}/images/icon.ico`,
             title: 'Jason'
         })
@@ -72,12 +72,9 @@ ipcMain.on('min', function() {
     })
     //登录窗口最大化
 ipcMain.on('max', function(e) {
-    console.log('..', mainWindow.isMaximized())
     if (mainWindow.isMaximized()) {
-        console.log('hhh')
         mainWindow.restore();
     } else {
-        console.log('hdasda')
         mainWindow.maximize();
     }
 })

@@ -1,0 +1,66 @@
+    // 引入iconfont
+    @import '@/iconfont.scss';
+    .icon-wechat-logo:before {
+        color: #2ecc71;
+        content: '\e73b';
+        cursor: pointer;
+    }
+    
+    .register-wrapper {
+        display: flex;
+        flex-direction: column;
+        .register-container {
+            padding: 20px 30px 9px 30px;
+            background-color: rgba(0, 0, 0, 0.4);
+            position: relative;
+            /deep/ .el-input__inner {
+                height: 30px;
+                background-color: rgba(0, 0, 0, 0.1);
+                color: #fff;
+                font-size: $theme-font-size;
+                border-radius: 1px;
+            }
+            /deep/ .el-input__inner:focus {
+                border-color: #90F790;
+            }
+            /deep/ .el-form-item__label {
+                font-size: $theme-font-size;
+            }
+            /deep/ .el-form-item__content {
+                display: flex;
+            }
+            /deep/ .el-input-group__append {
+                background: linear-gradient(to right, #FF416C, #FF4B2B);
+                border-radius: 0px;
+                border-image: linear-gradient(to right, #FF416C, #FF4B2B);
+                padding: 0 10px;
+                font-size: $theme-font-size;
+                color: #fff;
+                cursor: pointer;
+                opacity: 0.7;
+                transition: all .3s linear;
+            }
+            /deep/ .el-input-group__append:hover {
+                opacity: 1;
+            }
+        }
+        .register-container::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid #e74c3c;
+            clip: rect(0px, 2px, 426px, 0px);
+            animation: borderAround1 3s linear;
+        }
+        @keyframes borderAround1 {
+            0% {
+                clip: rect(0px, 2px, 0px, 0px);
+            }
+            100% {
+                clip: rect(0px, 2px, 426px, 0px);
+            }
+        }
+    }

@@ -4,24 +4,41 @@
         <div class='background-wrapper'></div>
         <div class='homepage-container'>
             <div class='logo'></div>
-            <login-component></login-component>
+            <transition name='login-fade'>
+                <login-component v-if='showLogin' @displayRegister='displayRegister'></login-component>
+            </transition>
+            <transition name='register-fade'>
+                <register-component v-if='showRegister'></register-component>
+            </transition>
         </div>
     </div>
 </template>
 
 <script>
-import './index';
+import './index'
 import LoginComponent from '../../components/Login/index.vue'
+import RegisterComponent from '../../components/Register/index.vue'
 export default {
     name:'home-page',
     data(){
         return{
-
+            showLogin:true,
+            showRegister:false
         }
     },
     components:{
-        LoginComponent
+        LoginComponent,
+        RegisterComponent
+    },
+    methods:{
+        displayRegister:function(){
+            this.showLogin = false;
+            setTimeout( () => {
+                this.showRegister = true
+            },500)
+        }
     }
+    
 }
 </script>
 
