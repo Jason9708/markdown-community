@@ -2,7 +2,7 @@
   <div id="app">
     <div class='header' style="-webkit-app-region: drag;">
       <i class="el-icon-minus" style='margin-right:20px;cursor:pointer;-webkit-app-region: no-drag;' @click="operate('min')"></i>
-      <i class="el-icon-copy-document" style='margin-right:20px;cursor:pointer;-webkit-app-region: no-drag;' @click="operate('max')"></i>
+      <!-- <i class="el-icon-copy-document" style='margin-right:20px;cursor:pointer;-webkit-app-region: no-drag;' @click="operate('max')"></i> -->
       <i class="el-icon-close" style='margin-right:20px;cursor:pointer;-webkit-app-region: no-drag;' @click="operate('close')"></i>
     </div>
     <router-view></router-view>
@@ -42,7 +42,7 @@ html,body{
   width:100%;
   justify-content:flex-end;
   padding:10px;
-  color:#fff;
+  color:#000;
   z-index:999;
   font-size:$theme-font-size;
 }
