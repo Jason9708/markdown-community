@@ -14,13 +14,19 @@
                             <span class='intro'>我和我的猫还有你妈都很想你，开玩笑的，我没有猫，你也没有妈</span>
                         </div>
                     </div>
-                    <!-- 个人次要信息：联系方式、职业、公司 or 学校、个人网站 -->
+                    <!-- 个人次要信息：联系方式、职业、公司 or 学校 -->
                     <div class='subsidiary'>
                         <span style='display:flex;align-items:center;padding:5px;'><i class='icon-profession'></i> 前端工程师</span>
                         <span style='display:flex;align-items:center;padding:5px;'><i class='icon-company'></i> 滕迅、呵里巴巴、字节眺动、蝼蚁金服</span>
                         <span style='display:flex;align-items:center;padding:5px;'><i class='icon-profession'></i> 1107088997@qq.com</span>
                         <span style='display:flex;align-items:center;padding:5px;'><i class='icon-wechat'></i> Chicago9708</span>
                     </div>
+                </div>
+                <!-- 网站 -->
+                <div class='internet-box'>
+                    <i class='icon-weibo'></i>
+                    <i class='icon-internet'></i>
+                    <i class='icon-github'></i>
                 </div>
             </div>
             <div class='container-left'>
@@ -36,7 +42,7 @@
                     </div>
                     <div class='btn'>
                         <i class='icon-template'></i>
-                        <span style='margin-top:10px;'>Article</span>
+                        <span style='margin-top:10px;'>Document</span>
                     </div>
                     <div class='btn'>
                         <i class='icon-setting'></i>
@@ -123,6 +129,30 @@ export default {
 .icon-search:before {
     content: '\e7b3';
 }
+.icon-weibo:before {
+    content: '\e61f';
+    display:block;
+    margin:10px 5px;
+    font-size:15px;
+    cursor:pointer;
+    color:#303952;
+}
+.icon-internet:before {
+    content: '\e6f5';
+    display:block;
+    margin:10px 5px;
+    font-size:15px;
+    cursor:pointer;
+    color:#303952;
+}
+.icon-github:before {
+    content: '\e709';
+    display:block;
+    margin:10px 5px;
+    font-size:15px;
+    cursor:pointer;
+    color:#303952;
+}
 
 // css style
 .Home-wrapper{
@@ -135,17 +165,17 @@ export default {
         height:310px;
         display:flex;
         .container-right{
-            margin:30px;
-            width:400px;
+            margin:50px 20px 30px 50px;
+            width:500px;
             display:flex;
-            flex-direction:column;
+            align-items:center;
             .information-box{
                 position:relative;
                 display:flex;
                 flex-direction:column;
-                background:linear-gradient(to right, #F3A183, #EC6F66);
+                background:linear-gradient(to right top, #ffbe76, #f0932b);
                 color:#fff;
-                box-shadow:0 0 20px -4px #000;
+                box-shadow:0 0 20px -6px #000;
                 margin-bottom:20px;
                 border-radius:10px;
                 .main{
@@ -182,6 +212,18 @@ export default {
                     padding:10px 20px 20px 50px;
                 }
             }
+            .internet-box{
+                display:flex;
+                flex-direction:column;
+                justify-content:center;
+                align-items:center;
+                height:100px;
+                margin-left:15px;
+                background:#fff;
+                border-radius:8px;
+                box-shadow:0 0 10px -10px #000;
+                padding:10px;
+            }
         }
         .container-left{
             flex:1;
@@ -208,9 +250,10 @@ export default {
                     transition-duration: .5s;
                     transition-property:color;
                     border-radius:10px;
+                    color:#303952;
                 }
                 .btn:hover {
-                    background:linear-gradient(to right, #F3A183, #EC6F66);
+                    background:linear-gradient(to right top, #ffbe76, #f0932b);
                     color:#fff;
                     box-shadow:0 0 15px -5px #000;
                 }
@@ -218,7 +261,7 @@ export default {
         }
     }
     .Home-carousel{
-        padding:10px 0px;
+        padding:30px 0px 20px 0px;
     }
 
     // element 
@@ -246,6 +289,7 @@ export default {
         box-shadow:0 0 15px -5px #000;
         color:#fff;
         font-size:$theme-font-size;
+        opacity:0.9;
         .search{
             flex:1;
             border:0;
@@ -257,10 +301,11 @@ export default {
     }
     // 进去/离开动画
     .fade-enter-active, .fade-leave-active {
-        transition: top .3s
+        transition: all .5s;
     }
     .fade-enter, .fade-leave-active {
-        top: -50px
+        top: -50px;
+        opacity:0;
     }
 }
 
