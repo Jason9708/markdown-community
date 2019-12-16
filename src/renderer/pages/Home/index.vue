@@ -4,6 +4,8 @@
             <div class='container-right'>
                 <!-- 右侧个人信息展示栏 -->
                 <div class='information-box'>
+                    <!-- 搜索按钮 -->
+                    <i class='icon-search' style='position:absolute;top:5px;right:5px;cursor:pointer;' @click='showSearchBox = true'></i>
                     <!-- 个人主要信息：头像、昵称、签名 -->
                     <div class='main'>
                         <img class='avator' src='../../assets/images/default_headPic.jpg'></img>
@@ -51,6 +53,13 @@
                 </el-carousel-item>
             </el-carousel>
         </div>
+        <!-- 搜索框 -->
+        <transition name='fade'>
+            <div class='search-box' v-if='showSearchBox'>
+                <i class='icon-search' style='font-size:12px;padding:3px;border:1px solid #EC6F66;border-radius:50%;background:#EC6F66;'></i>
+                <input type="text" class="search" v-model='keyWord' />
+            </div>
+        </transition>
     </div>
 </template>
 
@@ -60,14 +69,24 @@ export default {
     name:'Home',
     data(){
         return{
-            hotArticle:hotArticle
+            hotArticle:hotArticle,
+            keyWord:'', // 搜索值
+            showSearchBox:false, // 显示搜索框
         }
-    }
+    },
+    mounted(){
+        document.addEventListener('click',(e) => {
+            let className = e.target.className
+            if(className != 'search-box' && className != 'search' && className != 'icon-search'){
+                this.showSearchBox = false
+            }
+        })
+    },
 }
 </script>
 
 <style lang='scss' scoped>
-// 引入iconfont
+// iconfont
 @import '@/iconfont.scss';
 .icon-profession:before {
     content: '\e78e';
@@ -101,11 +120,16 @@ export default {
     content: '\e76c';
     font-size:40px;
 }
+.icon-search:before {
+    content: '\e7b3';
+}
 
+// css style
 .Home-wrapper{
     height:100%;
     width:100%;
-    background:#dfe4ea;
+    background:#f4f5f5;
+    position: relative;
     .Home-container{
         width:100%;
         height:310px;
@@ -116,6 +140,7 @@ export default {
             display:flex;
             flex-direction:column;
             .information-box{
+                position:relative;
                 display:flex;
                 flex-direction:column;
                 background:linear-gradient(to right, #F3A183, #EC6F66);
@@ -195,13 +220,47 @@ export default {
     .Home-carousel{
         padding:10px 0px;
     }
+
     // element 
     .el-carousel__item:nth-child(2n) {
         background-color: #99a9bf;
-    }
-    
+    }    
     .el-carousel__item:nth-child(2n+1) {
         background-color: #d3dce6;
+    }
+
+    // 搜索框
+    .search-box{
+        position: absolute;
+        top:20px;
+        left: 50%;
+        margin-left:-100px;
+        padding:5px 20px 5px 10px;
+        display: flex;
+        align-items: center;
+        height:30px;
+        width:200px;
+        background:#323237;
+        border:1px solid #323237;
+        border-radius:5px;
+        box-shadow:0 0 15px -5px #000;
+        color:#fff;
+        font-size:$theme-font-size;
+        .search{
+            flex:1;
+            border:0;
+            padding:5px 10px;
+            background: transparent;
+            color:#fff;
+            outline:none;
+        }
+    }
+    // 进去/离开动画
+    .fade-enter-active, .fade-leave-active {
+        transition: top .3s
+    }
+    .fade-enter, .fade-leave-active {
+        top: -50px
     }
 }
 

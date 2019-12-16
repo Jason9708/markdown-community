@@ -18,7 +18,7 @@ function createWindow() {
      * Initial window options
      */
     mainWindow = new BrowserWindow({
-            height: 600,
+            height: 650,
             width: 1000,
             frame: false, //是否显示窗口边框
             resizable: true, //可否缩放
