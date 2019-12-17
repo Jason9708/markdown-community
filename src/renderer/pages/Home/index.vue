@@ -32,19 +32,19 @@
             <div class='container-left'>
                 <!-- 左侧界面入口 -->
                 <div class='btn-group'>
-                    <div class='btn'>
+                    <div class='btn' @click="transLink('Home')">
                         <i class='icon-home'></i>
                         <span style='margin-top:10px;'>Home</span>
                     </div>
-                    <div class='btn'>
+                    <div class='btn' @click="transLink('Main')">
                         <i class='icon-write'></i>
                         <span style='margin-top:10px;'>Edtior</span>
                     </div>
-                    <div class='btn'>
+                    <div class='btn' @click="transLink('Home')">
                         <i class='icon-template'></i>
                         <span style='margin-top:10px;'>Document</span>
                     </div>
-                    <div class='btn'>
+                    <div class='btn' @click="transLink('Home')">
                         <i class='icon-setting'></i>
                         <span style='margin-top:10px;'>Profile</span>
                     </div>
@@ -88,6 +88,28 @@ export default {
             }
         })
     },
+    methods:{
+        /**
+         *  路由跳转
+         *  @route 路由路径名
+         */
+        transLink:function(route){
+            var routeName = ''
+            switch(route){
+                case 'Home':
+                    routeName = '/'
+                    break
+                case 'Main':
+                    routeName = '/main'
+                    break
+                default:
+                    routeName = '*'
+            }
+            this.$router.push({
+                path:routeName
+            })
+        }
+    }
 }
 </script>
 
