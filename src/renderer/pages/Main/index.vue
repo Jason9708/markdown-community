@@ -70,7 +70,7 @@ export default {
                 targets:'.side-scale',
                 translateX:-40,
                 easing:'easeInOutQuad',
-                rotate:180,  // 旋转
+                rotate:-180,  // 旋转
             })
             const anime03 = anime({
                 targets:'.menu-container',
@@ -127,6 +127,7 @@ export default {
             anime02.play()
             anime04.play()
         },
+        // 侧边栏伸缩
         scale:function(){
             if(this.noTigger){
                 this.tiggerAnime()
