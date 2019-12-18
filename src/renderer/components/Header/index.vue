@@ -119,7 +119,7 @@ export default {
         getCurrentDate(){
             let date = new Date()
             let hour = date.getHours()
-            if(hour < 9){ this.currentTime = 'morning' } 
+            if(hour < 12){ this.currentTime = 'morning' } 
             else if (hour < 18){ this.currentTime = 'afternoon' } 
             else if (hour < 24){ this.currentTime = 'evening' } 
             this.currentDate = date.toDateString().split(" ")[1] + ' ' + date.toDateString().split(" ")[2]
@@ -132,16 +132,16 @@ export default {
 // iconfont
 @import '@/iconfont.scss';
 .icon-smile:before{
-    content: '\e627';
-    font-size:30px;
+    content: '\e63f';
+    font-size:35px;
 }
 .icon-normal:before{
-    content: '\e64a';
-    font-size:30px;
+    content: '\e8da';
+    font-size:35px;
 }
 .icon-cry:before{
-    content: '\e639';
-    font-size:30px;
+    content: '\e758';
+    font-size:35px;
 }
 .icon-calendar:before{
     content: '\e640';
