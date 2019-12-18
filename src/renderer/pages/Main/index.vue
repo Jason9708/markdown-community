@@ -13,11 +13,11 @@
             </div>
             <!-- 菜单容器 -->
             <div class='menu-container'>
-                <div class='btn' @click="transLink('Home')">
+                <div class='btn' :class="$route.path === '/society'? 'active' : ''" @click="transLink('Home')">
                     <i class='icon-home'></i>
                     <span style='margin-top:10px;'>Home</span>
                 </div>
-                <div class='btn' :class="$route.path === '/main'? 'active' : ''" @click="transLink('Main')">
+                <div class='btn' :class="$route.path === '/create'? 'active' : ''" @click="transLink('Main')">
                     <i class='icon-write'></i>
                     <span style='margin-top:10px;'>Edtior</span>
                 </div>
@@ -136,6 +136,23 @@ export default {
                 this.restoreAnime()
                 this.noTigger = true
             }
+        },
+        // 侧边栏跳转
+        transLink:function(route){
+            var routeName = ''
+            switch(route){
+                case 'Home':
+                    routeName = '/society'
+                    break
+                case 'Main':
+                    routeName = '/create'
+                    break
+                default:
+                    routeName = '*'
+            }
+            this.$router.push({
+                path:routeName
+            })
         },
         goBack:function(){
             this.$router.push({

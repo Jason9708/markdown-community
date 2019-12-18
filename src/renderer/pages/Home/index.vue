@@ -97,10 +97,10 @@ export default {
             var routeName = ''
             switch(route){
                 case 'Home':
-                    routeName = '/'
+                    routeName = '/society'
                     break
                 case 'Main':
-                    routeName = '/main'
+                    routeName = '/create'
                     break
                 default:
                     routeName = '*'

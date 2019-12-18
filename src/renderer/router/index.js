@@ -21,13 +21,22 @@ export default new Router({
             name: 'Main',
             component: require('@/pages/Main/index.vue').default,
             children: [{
-                path: '/',
-                name: 'create',
-                meta: {
-                    title: '新建'
+                    path: '/create',
+                    name: 'create',
+                    meta: {
+                        title: '新建'
+                    },
+                    component: require('@/pages/Main/Article/create.vue').default,
                 },
-                component: require('@/pages/Main/Article/create.vue').default,
-            }]
+                {
+                    path: '/society',
+                    name: 'society',
+                    meta: {
+                        title: '社区'
+                    },
+                    component: require('@/pages/Main/Society/index.vue').default,
+                }
+            ]
         }
     ]
 })

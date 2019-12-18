@@ -70,8 +70,12 @@ export default {
     margin:0px 10px;
     /deep/ .markdown-body{
         height:90%;
+        font-family:-apple-system,system-ui,BlinkMacSystemFont,Helvetica Neue,PingFang SC,Hiragino Sans GB,Microsoft YaHei,Arial,sans-serif;
     }
     /deep/ .op-icon{
+        font-size:12px !important;
+    }
+    /deep/ .v-note-navigation-title{
         font-size:12px !important;
     }
 }
