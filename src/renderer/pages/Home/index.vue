@@ -3,7 +3,7 @@
         <div class='Home-container'>
             <div class='container-right'>
                 <!-- 右侧个人信息展示栏 -->
-                <div class='information-box'>
+                <div class='information-box' v-if='isLogin'>
                     <!-- 搜索按钮 -->
                     <i class='icon-search' style='position:absolute;top:5px;right:5px;cursor:pointer;' @click='showSearchBox = true'></i>
                     <!-- 个人主要信息：头像、昵称、签名 -->
@@ -23,10 +23,50 @@
                     </div>
                 </div>
                 <!-- 网站 -->
-                <div class='internet-box'>
+                <div class='internet-box' v-if='isLogin'>
                     <i class='icon-weibo'></i>
                     <i class='icon-internet'></i>
                     <i class='icon-github'></i>
+                </div>
+                <!-- login -->
+                <div class='login-box' v-if='!isLogin && !showRegister'>
+                    <img class='LOGO' src='../../assets/images/LOGO.png'>
+                    <!-- 切换注册框图标按钮 -->
+                    <i class='icon-register' style='position:absolute;top:10px;right:10px;cursor:pointer;color:#303952;' @click='turnRegisterClick'></i>
+                    <div class='input-box'>
+                        <!-- 动态线 -->
+                        <div class='dynamicLine'></div>
+                        <input class='INPUT' id='username' v-model='loginInfo.username' placeholder='username' style='margin-bottom:10px;' @click.stop='inputAnime'>
+                        <input class='INPUT' id='password' v-model='loginInfo.password'  @click.stop='inputAnime' placeholder='password' >
+                        <div class='BUTTON' @click='signinClcik'>
+                            <div class='LOADING'>
+                                <!-- 遮罩物 -->
+                                <div class='hide'>
+                                </div>
+                            </div>
+                            <div class='word'>SIGN IN</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- register -->
+                <div class='register-box' v-if='!isLogin && showRegister'>
+                    <img class='LOGO' src='../../assets/images/LOGO.png'>
+                    <!-- 切换登录框图标按钮 -->
+                    <i class='icon-login' style='position:absolute;top:10px;right:10px;cursor:pointer;color:#303952;' @click='turnLoginClick'></i>
+                    <div class='input-box'>
+                        <!-- 动态线 -->
+                        <div class='dynamicLine'></div>
+                        <input class='INPUT' id='username' v-model='registerInfo.username' placeholder='username' style='margin-bottom:10px;' @click.stop='inputAnime'>
+                        <input class='INPUT' id='password' v-model='registerInfo.password'  @click.stop='inputAnime' placeholder='password' >
+                        <div class='BUTTON' @click='registerClick'>
+                            <div class='LOADING'>
+                                <!-- 遮罩物 -->
+                                <div class='hide'>
+                                </div>
+                            </div>
+                            <div class='word'>REGISTER</div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class='container-left'>
@@ -71,13 +111,27 @@
 
 <script>
 import hotArticle from './mock.js'
+import anime from 'animejs'
 export default {
     name:'Home',
     data(){
         return{
             hotArticle:hotArticle,
             keyWord:'', // 搜索值
-            showSearchBox:false, // 显示搜索框
+            loginInfo:{
+                username:'',
+                password:''
+            },
+            registerInfo:{
+                username:'',
+                password:''
+            },
+            doAnime:'username',
+
+            // 显示与隐藏配置
+            showSearchBox:false,
+            isLogin:false,
+            showRegister:false,
         }
     },
     mounted(){
@@ -108,7 +162,104 @@ export default {
             this.$router.push({
                 path:routeName
             })
-        }
+        },
+        /**
+         * Animie 
+         * @inputAnime - 输入框动画
+         * @signinAnime - 登录按钮动画
+         */
+        inputAnime:function(e){
+            var current = null;
+            if(e.target.id == 'password' && this.doAnime == 'username') {
+                if (current) current.pause();
+                current = anime({
+                    targets: '.dynamicLine',
+                    keyframes: [
+                        {
+                            translateX:150,
+                            width:3,
+                        },
+                        {   
+                            height:40,
+                        },
+                        {
+                            height:3,
+                            translateY:40
+                        },
+                        {
+                            translateX:0,
+                            width:150
+                        }
+                    ],
+                    duration: 500,
+                    easing: 'linear'
+                });
+                this.doAnime = 'password'
+                current.play()
+            }
+            if(e.target.id == 'username' && this.doAnime == 'password') {
+                if (current) current.pause();
+                current = anime({
+                    targets: '.dynamicLine',
+                    keyframes: [
+                        {
+                            translateX:150,
+                            width:3,
+                        },
+                        {   
+                            height:40,
+                            translateY:0
+                        },
+                        {
+                            height:3,
+                        },
+                        {
+                            translateX:0,
+                            width:150
+                        }
+                    ],
+                    duration: 500,
+                    easing: 'linear'
+                });
+                this.doAnime = 'username'
+                current.play()
+            }
+        },
+        signinAnime:function(){
+            const Anime = anime({
+                targets:'.LOADING',
+                rotate:[0,360],
+                loop: true,
+                borderColor:['#ffbe76','#e67e22'],
+                easing: 'linear',
+                direction: 'alternate',
+                opacity:1,
+            })
+            Anime.play()
+        },
+        /**
+         * Click 
+         * @signinClcik - 登录点击事件
+         * @registerClick - 注册点击事件
+         */
+         signinClcik:function(){
+            this.signinAnime()
+            setTimeout(() => {
+                this.isLogin = true
+            },2000)
+         },
+         registerClick:function(){
+            this.signinAnime()
+            setTimeout(() => {
+                this.isLogin = true
+            },2000)
+         },
+         turnRegisterClick:function(){
+            this.showRegister = true
+         },
+         turnLoginClick:function(){
+            this.showRegister = false
+         }
     }
 }
 </script>
@@ -175,6 +326,14 @@ export default {
     cursor:pointer;
     color:#303952;
 }
+.icon-register:before {
+    content: '\e71c';
+    font-size:18px;
+}
+.icon-login:before {
+    content: '\e63a';
+    font-size:17px;
+}
 
 // css style
 .Home-wrapper{
@@ -213,6 +372,7 @@ export default {
                     .info{
                         padding:5px 0px;
                         display:flex;
+                        flex:1;
                         flex-direction:column;
                         justify-content:space-between;
                         .name{
@@ -232,6 +392,170 @@ export default {
                     flex-direction:column;
                     font-size:12px;
                     padding:10px 20px 20px 50px;
+                }
+            }
+            .login-box{
+                display:flex;
+                position:relative;
+                align-items:center;
+                width:100%;
+                height:100%;
+                background:#fff;
+                border-radius:10px;
+                .LOGO{
+                    width:200px;
+                    height:200px;
+                }
+                .input-box{
+                    flex:1;
+                    display:flex;
+                    flex-direction:column;
+                    align-items:center;
+                    position:relative;
+                    .dynamicLine{
+                        position:absolute;
+                        top:30px;
+                        left:70px;
+                        width:150px;
+                        height:3px;
+                        background:linear-gradient(to right, #ffbe76, #f0932b);
+                        border-radius:5px;
+                    }
+                    .INPUT{
+                        color:#303952;
+                        font-size:12px;
+                        font-weight:600;
+                        padding:5px 20px;
+                        width:150px;
+                        height:20px;
+                        border:0px;
+                        outline:none;
+                    }
+                    .BUTTON{
+                        margin-top:30px;
+                        position: relative;
+                        display: flex;
+                        flex-wrap:wrap;
+                        justify-content: center;
+                        align-items: center;
+                        width:150px;
+                        height:30px;
+                        color:#ffbe76;
+                        cursor:pointer;
+                        transition:all .5s ease;
+                        .word{
+                            position: absolute;
+                            font-size:14px;
+                            font-weight:600;
+                            font-family:'Microsoft JhengHei',"Open Sans", Helvetica, Arial, sans-serif;
+                            letter-spacing:1px;
+                            z-index:2;
+                        }
+                        .LOADING{
+                            position:absolute;
+                            top:7px;
+                            left:20px;
+                            width:12px;
+                            height:12px;
+                            border-radius:50%;
+                            border:2px solid #ffbe76;
+                            opacity:0;
+                            .hide{
+                                position:absolute;
+                                top:2.5px;
+                                left:-2px;
+                                width:20px;
+                                height:5px;
+                                background:#fff;
+                            }
+                            
+                        }
+                    }
+                    .BUTTON:hover {
+                        color:#f0932b;
+                    }
+                }
+            }
+            .register-box{
+                display:flex;
+                align-items:center;
+                position:relative;
+                width:100%;
+                height:100%;
+                background:#fff;
+                border-radius:10px;
+                .LOGO{
+                    width:200px;
+                    height:200px;
+                }
+                .input-box{
+                    flex:1;
+                    display:flex;
+                    flex-direction:column;
+                    align-items:center;
+                    position:relative;
+                    .dynamicLine{
+                        position:absolute;
+                        top:30px;
+                        left:70px;
+                        width:150px;
+                        height:3px;
+                        background:linear-gradient(to right, #ffbe76, #f0932b);
+                        border-radius:5px;
+                    }
+                    .INPUT{
+                        color:#303952;
+                        font-size:12px;
+                        font-weight:600;
+                        padding:5px 20px;
+                        width:150px;
+                        height:20px;
+                        border:0px;
+                        outline:none;
+                    }
+                    .BUTTON{
+                        margin-top:30px;
+                        position: relative;
+                        display: flex;
+                        flex-wrap:wrap;
+                        justify-content: center;
+                        align-items: center;
+                        width:150px;
+                        height:30px;
+                        color:#ffbe76;
+                        cursor:pointer;
+                        transition:all .5s ease;
+                        .word{
+                            position: absolute;
+                            font-size:14px;
+                            font-weight:600;
+                            font-family:'Microsoft JhengHei',"Open Sans", Helvetica, Arial, sans-serif;
+                            letter-spacing:1px;
+                            z-index:2;
+                        }
+                        .LOADING{
+                            position:absolute;
+                            top:7px;
+                            left:15px;
+                            width:12px;
+                            height:12px;
+                            border-radius:50%;
+                            border:2px solid #ffbe76;
+                            opacity:0;
+                            .hide{
+                                position:absolute;
+                                top:2.5px;
+                                left:-2px;
+                                width:20px;
+                                height:5px;
+                                background:#fff;
+                            }
+                            
+                        }
+                    }
+                    .BUTTON:hover {
+                        color:#f0932b;
+                    }
                 }
             }
             .internet-box{

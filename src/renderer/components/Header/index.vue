@@ -218,6 +218,8 @@ export default {
             font-weight:700;
             .time{
                 margin-left:10px;
+                display:flex;
+                align-items:center;
             }
         }
     }

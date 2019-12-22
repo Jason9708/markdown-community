@@ -21,7 +21,7 @@ function createWindow() {
             height: 650,
             width: 1000,
             frame: false, //是否显示窗口边框
-            resizable: true, //可否缩放
+            resizable: false, //可否缩放
             movable: true, //可否移动
             icon: `${__static}/images/icon.ico`,
             title: 'Jason'
