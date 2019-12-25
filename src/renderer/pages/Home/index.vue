@@ -70,7 +70,7 @@
                 </div>
             </div>
             <div class='container-left'>
-                <!-- 左侧界面入口 -->
+                <!-- 右侧界面入口 -->
                 <div class='btn-group'>
                     <div class='btn' @click="transLink('Home')">
                         <i class='icon-home'></i>
@@ -84,7 +84,7 @@
                         <i class='icon-template'></i>
                         <span style='margin-top:10px;'>Document</span>
                     </div>
-                    <div class='btn' @click="transLink('Home')">
+                    <div class='btn' @click="transLink('Profile')">
                         <i class='icon-setting'></i>
                         <span style='margin-top:10px;'>Profile</span>
                     </div>
@@ -155,6 +155,9 @@ export default {
                     break
                 case 'Main':
                     routeName = '/create'
+                    break
+                case 'Profile':
+                    routeName = '/profile'
                     break
                 default:
                     routeName = '*'

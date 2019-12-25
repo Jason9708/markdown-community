@@ -35,6 +35,14 @@ export default new Router({
                         title: '社区'
                     },
                     component: require('@/pages/Main/Society/index.vue').default,
+                },
+                {
+                    path: '/profile',
+                    name: 'profile',
+                    meta: {
+                        title: '修改个人信息'
+                    },
+                    component: require('@/pages/Main/Profile/index.vue').default,
                 }
             ]
         }
