@@ -1,9 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-
+import store from '../store';
+import jwt_decode from 'jwt-decode'
+import { Message } from 'element-ui'
 Vue.use(Router)
 
-export default new Router({
+const route = new Router({
     routes: [{
             path: '/',
             name: 'Home',
@@ -48,3 +50,49 @@ export default new Router({
         }
     ]
 })
+
+route.beforeEach((to, from, next) => {
+    // 若返回首页以及社区，无须鉴权
+    if (to.path == '/' || to.path == '/society') {
+        next()
+    } else {
+        /**
+         * 判断当前是否存在Token
+         * @存在则进行鉴权判断
+         * @不存在则返回首页
+         */
+        if (localStorage.Token) {
+            /**
+             * 判断当前Token是否过期
+             * @过期则跳回首页
+             * @未过期则成功跳转
+             */
+            const decoded = jwt_decode(localStorage.Token)
+            const currentTime = Date.now() / 1000
+            console.log('Token_Decode & currentTime', decoded, currentTime)
+            if (decoded.exp < currentTime) {
+                Vue.prototype.$notify({
+                    title: 'Tips',
+                    message: 'Token过期，重新登录',
+                    type: 'error',
+                    duration: 3000
+                })
+                store.dispatch('clearCurrentState')
+                next('/')
+            } else {
+                next()
+            }
+        } else {
+            Vue.prototype.$notify({
+                title: 'Tips',
+                message: '请先登录！',
+                type: 'error',
+                duration: 3000
+            })
+            store.dispatch('clearCurrentState')
+            next('/')
+        }
+    }
+})
+
+export default route;

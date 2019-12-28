@@ -10,16 +10,16 @@
                     <div class='main'>
                         <img class='avator' src='../../assets/images/default_headPic.jpg'></img>
                         <div class='info'>
-                            <span class='name'>Jason</span>
-                            <span class='intro'>我和我的猫还有你妈都很想你，开玩笑的，我没有猫，你也没有妈</span>
+                            <span class='name'>{{userInfo.nickname !='' ? userInfo.nickname : userInfo.username}}</span>
+                            <span class='intro'>{{userInfo.intro}}</span>
                         </div>
                     </div>
                     <!-- 个人次要信息：联系方式、职业、公司 or 学校 -->
                     <div class='subsidiary'>
-                        <span style='display:flex;align-items:center;padding:5px;'><i class='icon-profession'></i> 前端工程师</span>
-                        <span style='display:flex;align-items:center;padding:5px;'><i class='icon-company'></i> 滕迅、呵里巴巴、字节眺动、蝼蚁金服</span>
-                        <span style='display:flex;align-items:center;padding:5px;'><i class='icon-profession'></i> 1107088997@qq.com</span>
-                        <span style='display:flex;align-items:center;padding:5px;'><i class='icon-wechat'></i> Chicago9708</span>
+                        <span style='display:flex;align-items:center;padding:5px;'><i class='icon-profession'></i> {{userInfo.profession}}</span>
+                        <span style='display:flex;align-items:center;padding:5px;'><i class='icon-company'></i> {{userInfo.company}}</span>
+                        <span style='display:flex;align-items:center;padding:5px;'><i class='icon-profession'></i>{{userInfo.email}}</span>
+                        <span style='display:flex;align-items:center;padding:5px;'><i class='icon-wechat'></i>{{userInfo.wechat}}</span>
                     </div>
                 </div>
                 <!-- 网站 -->
@@ -110,6 +110,7 @@
 </template>
 
 <script>
+import { userRegister, userLogin, getUserInfo } from '../../Api/api.js'
 import hotArticle from './mock.js'
 import anime from 'animejs'
 export default {
@@ -126,12 +127,17 @@ export default {
                 username:'',
                 password:''
             },
+            userInfo:{},
             doAnime:'username',
 
             // 显示与隐藏配置
             showSearchBox:false,
-            isLogin:false,
             showRegister:false,
+        }
+    },
+    computed:{
+        isLogin:function(){
+            return this.$store.state.isAuthenticated
         }
     },
     mounted(){
@@ -169,7 +175,7 @@ export default {
         /**
          * Animie 
          * @inputAnime - 输入框动画
-         * @signinAnime - 登录按钮动画
+         * @loadingAnime - 加载动画
          */
         inputAnime:function(e){
             var current = null;
@@ -228,7 +234,7 @@ export default {
                 current.play()
             }
         },
-        signinAnime:function(){
+        loadingAnime:function(){
             const Anime = anime({
                 targets:'.LOADING',
                 rotate:[0,360],
@@ -246,23 +252,71 @@ export default {
          * @registerClick - 注册点击事件
          */
          signinClcik:function(){
-            this.signinAnime()
-            setTimeout(() => {
-                this.isLogin = true
-            },2000)
+            this.loadingAnime()
+            userLogin(this.loginInfo).then( res => {
+                if(res.data.code == 0){
+                    // 获取 token 存入缓存
+                    const token = res.data.token
+                    window.localStorage.setItem('Token',token)
+                    // 更新授权状态
+                    this.$store.dispatch('setIsAuthenticated',true)
+                    // 查询当前登录人信息
+                    this.getLoginUserInfo(res.data.data.username)
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                    anime.remove('.LOADING')
+                }
+            })
          },
          registerClick:function(){
-            this.signinAnime()
-            setTimeout(() => {
-                this.isLogin = true
-            },2000)
+            this.loadingAnime()
+            userRegister(this.registerInfo).then( res => {
+                if(res.data.code == 0){
+                    this.showRegister = false
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'success',
+                        duration:3000
+                    });   
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    });
+                }
+            })
          },
          turnRegisterClick:function(){
             this.showRegister = true
          },
          turnLoginClick:function(){
             this.showRegister = false
-         }
+         },
+        /**
+         * 查询登陆人信息
+         */
+        getLoginUserInfo:function(username){
+            getUserInfo(username).then( res => {
+               if(res.data.code == 0){
+                   this.userInfo = res.data.data
+               }else{
+                   this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    });
+               }
+            })
+        }
     }
 }
 </script>
@@ -357,10 +411,11 @@ export default {
                 position:relative;
                 display:flex;
                 flex-direction:column;
+                min-width:400px;
+                margin-bottom:20px;
                 background:linear-gradient(to right top, #ffbe76, #f0932b);
                 color:#fff;
                 box-shadow:0 0 20px -6px #000;
-                margin-bottom:20px;
                 border-radius:10px;
                 .main{
                     padding:30px 20px 30px 20px;

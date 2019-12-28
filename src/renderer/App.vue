@@ -5,7 +5,7 @@
       <!-- <i class="el-icon-copy-document" style='margin-right:20px;cursor:pointer;-webkit-app-region: no-drag;' @click="operate('max')"></i> -->
       <i class="el-icon-close" style='margin-right:20px;cursor:pointer;-webkit-app-region: no-drag;' @click="operate('close')"></i>
     </div>
-    <router-view></router-view>
+    <router-view v-loading='Loading'></router-view>
   </div>
 </template>
 
@@ -13,6 +13,11 @@
   const { ipcRenderer: ipc } = require("electron");
   export default {
     name: 'jason-community',
+    computed:{
+      Loading:function(){
+        return this.$store.state.loading
+      }
+    },
     methods:{
       operate:function(operate){
         ipc.send(operate)

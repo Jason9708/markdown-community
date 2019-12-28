@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import axios from './utils/http'
 import App from './App'
 import router from './router'
 import store from './store'
@@ -11,7 +10,6 @@ import 'mavon-editor/dist/css/index.css'
 Vue.use(mavonEditor)
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
-Vue.API = Vue.prototype.$API = axios
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
