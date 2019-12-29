@@ -6,7 +6,7 @@
             </div>
             <div class='info_setting'>
                 <!-- 表单设置 -->
-                <el-input v-model="formData.nickname">
+                <el-input v-model="userInfo.nickname">
                     <template slot="prepend">昵称</template>
                 </el-input>
                 <el-input
@@ -14,29 +14,29 @@
                     autosize
                     placeholder="请输入简介"
                     maxlength='100'
-                    v-model="formData.intro">
+                    v-model="userInfo.intro">
                 </el-input>
-                <el-input v-model="formData.profession">
+                <el-input v-model="userInfo.profession">
                     <template slot="prepend">职业</template>
                 </el-input>
-                <el-input v-model="formData.company">
+                <el-input v-model="userInfo.company">
                     <template slot="prepend">公司</template>
                 </el-input>
-                <el-input v-model="formData.email">
+                <el-input v-model="userInfo.email">
                     <template slot="prepend">邮箱</template>
                 </el-input>
-                <el-input v-model="formData.weibo">
+                <el-input v-model="userInfo.weibo">
                     <template slot="prepend">微博</template>
                 </el-input>
-                <el-input v-model="formData.github">
+                <el-input v-model="userInfo.github">
                     <template slot="prepend">Github</template>
                 </el-input>
-                <el-input v-model="formData.internet">
+                <el-input v-model="userInfo.internet">
                     <template slot="prepend">个人网站</template>
                 </el-input>
             </div>
             <div class='btn_group'>
-                <div class='save'>
+                <div class='save' @click='updateClick'>
                     Submit
                 </div>
             </div>
@@ -45,6 +45,7 @@
 </template>
 
 <script>
+import { getUserInfo, updateUserInfo } from '../../../Api/api.js'
 import uploadImg from '../../../components/Uploadimg'
 export default {
     name:'profileSetting',
@@ -54,7 +55,7 @@ export default {
             uploadUrl:'xxx', // 上传地址
             limit:1,
             // 表单数据
-            formData:{
+            userInfo:{
                 nickname:'',
                 intro:'',
                 profession:'',
@@ -69,8 +70,56 @@ export default {
     components:{
         uploadImg
     },
+    mounted(){
+        this.getLoginUserInfo()
+    },
     methods:{
-
+        /**
+         * 查询登陆人信息
+         *  调用时携带 Token ，通过 Token 查询
+         */
+        getLoginUserInfo:function(){
+            getUserInfo().then( res => {
+               if(res.data.code == 0){
+                   this.$store.dispatch('setUser',res.data.data)
+                   this.userInfo = res.data.data
+               }else{
+                   this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    });
+               }
+            })
+        },
+        /**
+         * 更新用户信息
+         *  @userInfo   表单数据
+         */
+        updateClick:function(){
+            updateUserInfo(this.userInfo).then( res => {
+                if(res.data.code == 0){
+                    this.$store.dispatch('setUser',res.data.data)
+                    this.$notify({
+                        title: 'Tips',
+                        message: '保存成功！',
+                        type: 'success',
+                        duration:3000
+                    });
+                    this.$router.push({
+                        path:'/'
+                    })
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    });
+                }
+            })
+        }
     }
 }
 </script>

@@ -14,6 +14,9 @@ const Axios = axios.create({
         timeout: 10000,
         responseType: 'json',
         withCredentials: true,
+        headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+        },
         proxy: {
             host: 'localhost',
             port: 5000,

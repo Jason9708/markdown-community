@@ -18,15 +18,15 @@
                     <div class='subsidiary'>
                         <span style='display:flex;align-items:center;padding:5px;'><i class='icon-profession'></i> {{userInfo.profession}}</span>
                         <span style='display:flex;align-items:center;padding:5px;'><i class='icon-company'></i> {{userInfo.company}}</span>
-                        <span style='display:flex;align-items:center;padding:5px;'><i class='icon-profession'></i>{{userInfo.email}}</span>
+                        <span style='display:flex;align-items:center;padding:5px;'><i class='icon-email'></i>{{userInfo.email}}</span>
                         <span style='display:flex;align-items:center;padding:5px;'><i class='icon-wechat'></i>{{userInfo.wechat}}</span>
                     </div>
                 </div>
                 <!-- 网站 -->
                 <div class='internet-box' v-if='isLogin'>
-                    <i class='icon-weibo'></i>
-                    <i class='icon-internet'></i>
-                    <i class='icon-github'></i>
+                    <i class='icon-weibo' @click="userInfo.weibo !='' ? openUrl(userInfo.weibo) : ''"></i>
+                    <i class='icon-internet' @click="userInfo.internet !='' ? openUrl(userInfo.internet) : ''"></i>
+                    <i class='icon-github' @click="userInfo.github !='' ? openUrl(userInfo.github) : ''"></i>
                 </div>
                 <!-- login -->
                 <div class='login-box' v-if='!isLogin && !showRegister'>
@@ -147,6 +147,10 @@ export default {
                 this.showSearchBox = false
             }
         })
+        // 进入首页时若为登录状态，重新获取登录人信息
+        if(this.isLogin){
+            this.getLoginUserInfo()
+        }
     },
     methods:{
         /**
@@ -250,6 +254,7 @@ export default {
          * Click 
          * @signinClcik - 登录点击事件
          * @registerClick - 注册点击事件
+         * @openUrl - 链接跳转
          */
          signinClcik:function(){
             this.loadingAnime()
@@ -261,7 +266,7 @@ export default {
                     // 更新授权状态
                     this.$store.dispatch('setIsAuthenticated',true)
                     // 查询当前登录人信息
-                    this.getLoginUserInfo(res.data.data.username)
+                    this.getLoginUserInfo()
                 }else{
                     this.$notify({
                         title: 'Tips',
@@ -300,12 +305,17 @@ export default {
          turnLoginClick:function(){
             this.showRegister = false
          },
+         openUrl:function(url){
+             window.open(url)
+         },
         /**
          * 查询登陆人信息
+         *  调用时携带 Token ，通过 Token 查询
          */
-        getLoginUserInfo:function(username){
-            getUserInfo(username).then( res => {
+        getLoginUserInfo:function(){
+            getUserInfo().then( res => {
                if(res.data.code == 0){
+                   this.$store.dispatch('setUser',res.data.data)
                    this.userInfo = res.data.data
                }else{
                    this.$notify({
