@@ -2,7 +2,7 @@
     <div class='profile_wrapper'>
         <div class='profile_container'>
             <div class='avatar_setting'>
-                <upload-img :uploadUrl='uploadUrl' tips='上传jpg/png文件，且不超过2Mb' :limit='limit'></upload-img>
+                <upload-img :uploadUrl='uploadUrl' :headers='headers' tips='上传jpg/png文件，且不超过2Mb' :limit='limit' :showFileList='showFileList' @onSuccess='uploadSuccess'></upload-img>
             </div>
             <div class='info_setting'>
                 <!-- 表单设置 -->
@@ -52,8 +52,10 @@ export default {
     data(){
         return{
             // 头像上传配置
-            uploadUrl:'xxx', // 上传地址
+            uploadUrl:'http://localhost:5000/hdgc/upload/uploadHeaderPic', // 上传地址
+            headers:{},
             limit:1,
+            showFileList:false,
             // 表单数据
             userInfo:{
                 nickname:'',
@@ -71,6 +73,12 @@ export default {
         uploadImg
     },
     mounted(){
+        if(localStorage.getItem('Token')){
+            this.headers = {
+                Authorization:localStorage.getItem('Token')
+            }
+            console.log('headers:',this.headers)
+        }
         this.getLoginUserInfo()
     },
     methods:{
@@ -106,7 +114,7 @@ export default {
                         message: '保存成功！',
                         type: 'success',
                         duration:3000
-                    });
+                    })
                     this.$router.push({
                         path:'/'
                     })
@@ -116,8 +124,20 @@ export default {
                         message: res.data.message,
                         type: 'error',
                         duration:3000
-                    });
+                    })
                 }
+            })
+        },
+        /**
+         * 图片上传成功回调
+         * @tips - 重新登录生效
+         */
+        uploadSuccess(){
+            this.$notify({
+                title: 'Tips',
+                message: '保存成功，重新登录生效',
+                type: 'success',
+                duration:3000
             })
         }
     }

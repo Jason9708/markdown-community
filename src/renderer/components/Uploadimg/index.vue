@@ -18,7 +18,9 @@
             class="avatar-uploader"
             :action="uploadUrl"
             :multiple='multiple'
-            :data ='extraData'
+            :data='extraData'
+            :headers='headers'
+            :file-list="fileList"
             :show-file-list="showFileList"
             :on-success="onSuccess"
             :on-error='onError'
@@ -42,7 +44,7 @@ export default {
             imageUrl:''
         }
     },
-    props:[ 'uploadUrl', 'showFileList', 'multiple', 'extraData', 'limit', 'autoUpload', 'tips'],
+    props:[ 'uploadUrl', 'showFileList', 'multiple', 'extraData', 'limit', 'autoUpload', 'tips', 'headers','fileList'],
     methods:{
         onSuccess(res, file, fileList) {
             this.imageUrl = URL.createObjectURL(file.raw);

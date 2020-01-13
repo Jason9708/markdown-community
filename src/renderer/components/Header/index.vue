@@ -2,7 +2,7 @@
     <div class='header-container'>
         <div class='top'>
             <span class='greet'>Good {{currentTime}}.</span>
-            <span class='name'>Chicago!</span>
+            <span class='name'>{{Name}}!</span>
         </div>
         <div class='bottom'>
             <!-- 心情选择 -->
@@ -42,6 +42,11 @@ export default {
     },
     mounted(){
         this.getCurrentDate()
+    },
+    computed:{
+        Name:function(){
+            return this.$store.state.user.nickname ? this.$store.state.user.nickname : this.$store.state.user.username
+        }
     },
     methods:{
         // 触发动画

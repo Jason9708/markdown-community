@@ -8,7 +8,7 @@
                     <i class='icon-search' style='position:absolute;top:5px;right:5px;cursor:pointer;' @click='showSearchBox = true'></i>
                     <!-- 个人主要信息：头像、昵称、签名 -->
                     <div class='main'>
-                        <img class='avator' src='../../assets/images/default_headPic.jpg'></img>
+                        <img class='avator' :src="userInfo.avatar ? global.avatarPath + userInfo.avatar : default_headPic"></img>
                         <div class='info'>
                             <span class='name'>{{userInfo.nickname !='' ? userInfo.nickname : userInfo.username}}</span>
                             <span class='intro'>{{userInfo.intro}}</span>
@@ -37,7 +37,7 @@
                         <!-- 动态线 -->
                         <div class='dynamicLine'></div>
                         <input class='INPUT' id='username' v-model='loginInfo.username' placeholder='username' style='margin-bottom:10px;' @click.stop='inputAnime'>
-                        <input class='INPUT' id='password' v-model='loginInfo.password'  @click.stop='inputAnime' placeholder='password' >
+                        <input class='INPUT' id='password' v-model='loginInfo.password' type='password'  @click.stop='inputAnime' placeholder='password' >
                         <div class='BUTTON' @click='signinClcik'>
                             <div class='LOADING'>
                                 <!-- 遮罩物 -->
@@ -117,6 +117,7 @@ export default {
     name:'Home',
     data(){
         return{
+            default_headPic:require('../../assets/images/default_headPic.jpg'),
             hotArticle:hotArticle,
             keyWord:'', // 搜索值
             loginInfo:{
@@ -317,6 +318,7 @@ export default {
                if(res.data.code == 0){
                    this.$store.dispatch('setUser',res.data.data)
                    this.userInfo = res.data.data
+                   sessionStorage.setItem('currentUserInfo',this.userInfo)
                }else{
                    this.$notify({
                         title: 'Tips',

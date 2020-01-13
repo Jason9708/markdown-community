@@ -2,7 +2,7 @@
     <div class='main-wrapper'>
         <!-- 侧边栏 -->
         <div class='side-bar'>
-            <img class='avator' src='../../assets/images/default_headPic.jpg'/>
+            <img class='avator' :src="Avatar ? global.avatarPath + Avatar : default_headPic" />
             <!-- 缩小侧边栏 -->
             <div class='side-scale' @click='scale'>
                 <i class='icon-left'></i>
@@ -44,11 +44,17 @@ export default {
     name:'Main',
     data(){
         return{
+            default_headPic:require('../../assets/images/default_headPic.jpg'),
             // 触发anime配置
             noTigger:true,
         }
     },
     mounted(){
+    },
+    computed:{
+        Avatar:function(){
+            return this.$store.state.user.avatar
+        }
     },
     methods:{
         // 触发 anime
