@@ -2,16 +2,16 @@
     <div class='create-wrapper'>
         <Header class='header-component'></Header>
         <!-- 提交按钮 -->
-        <div class='create-submit' @click='beforeSumbit'>
+        <div class='create-submit' @click='beforeSubmit'>
             发布
         </div>
-        <Editor class='editor'></Editor>
+        <Editor class='editor' ref='editor'></Editor>
         <!-- 提交弹窗 -->
         <el-dialog
             title="发布文章"
             :visible.sync="submitDialog"
             width="40%"
-            custom-class='sumbit-dialog'
+            custom-class='submit-dialog'
             :before-close="handleDialogClose"
         >
             <div class='title'>
@@ -41,7 +41,7 @@
             </div>
             <span slot="footer" class="dialog-footer">
                 <div class='dialog-cancel' @click="handleDialogClose">取 消</div>
-                <div class='dialog-submit' @click="submitDialog = false">确 定</div>
+                <div class='dialog-submit' @click="submitArticle">确 定</div>
             </span>
         </el-dialog>
     </div>
@@ -69,11 +69,11 @@ export default {
     },
     methods:{
         // 点击发布（ 弹出弹窗）
-        beforeSumbit:function(){
+        beforeSubmit:function(){
             this.submitDialog = true
         },
         // 弹窗关闭前回调
-        handleDialogClose(){
+        handleDialogClose:function(){
             // 清空
             this.articleInfo.title = ''
             this.articleInfo.coverPic = ''
@@ -99,9 +99,13 @@ export default {
             this.articleInfo.coverPic = ''
         },
         // 选择分类
-        changeClassification(type){
+        changeClassification:function(type){
             // 1-随笔   2-新闻   3-知识   4-沸点
             this.articleInfo.classification = type
+        },
+        submitArticle:function(){
+            this.articleInfo.content = this.$refs.editor.getContent()
+            console.log(this.articleInfo)
         }
     }
 }
@@ -143,7 +147,7 @@ export default {
     .editor{
         flex:1;
     }
-    .sumbit-dialog{
+    .submit-dialog{
         .title{
             padding:5px;
             border:0;

@@ -60,6 +60,10 @@ export default {
     methods:{
         uploadCb:function(file){
             console.log(file)
+        },
+        // 获取当前文章内容
+        getContent:function(){
+            return this.mavonEditor.content
         }
     }
 }
