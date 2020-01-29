@@ -39,6 +39,14 @@ const route = new Router({
                     component: require('@/pages/Main/Society/index.vue').default,
                 },
                 {
+                    path: '/document',
+                    name: 'document',
+                    meta: {
+                        title: '个人文章'
+                    },
+                    component: require('@/pages/Main/Document/index.vue').default,
+                },
+                {
                     path: '/profile',
                     name: 'profile',
                     meta: {

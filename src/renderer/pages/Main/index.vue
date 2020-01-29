@@ -21,7 +21,7 @@
                     <i class='icon-write'></i>
                     <span style='margin-top:10px;'>Edtior</span>
                 </div>
-                <div class='btn' @click="transLink('Home')">
+                <div class='btn' :class="$route.path === '/document'? 'active' : ''" @click="transLink('Document')">
                     <i class='icon-template'></i>
                     <span style='margin-top:10px;'>Document</span>
                 </div>
@@ -153,12 +153,16 @@ export default {
                 case 'Main':
                     routeName = '/create'
                     break
+                case 'Document':
+                    routeName = '/document'
+                    break
                 case 'Profile':
                     routeName = '/profile'
                     break
                 default:
                     routeName = '*'
             }
+            console.log(routeName)
             this.$router.push({
                 path:routeName
             })
