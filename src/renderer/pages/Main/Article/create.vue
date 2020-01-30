@@ -1,6 +1,6 @@
 <template>
     <div class='create-wrapper'>
-        <Header class='header-component'></Header>
+        <Header class='header-component' @getExpression='getExpression'></Header>
         <!-- 提交按钮 -->
         <div class='create-submit' @click='beforeSubmit'>
             发布
@@ -15,12 +15,12 @@
             :before-close="handleDialogClose"
         >
             <div class='title'>
-                <input class='title-input' v-model='articleInfo.title' placeholder='输入文章标题...'></input>
+                <input class='title-input' v-model='articleInfo.title' placeholder='输入文章标题...' maxlength="50"></input>
             </div>
             <!-- 添加封面大图 -->
             <div class='upload'>
                 <!-- 未添加 -->
-                <template v-if="articleInfo.coverPic === ''">
+                <template v-if="articleInfo.file === ''">
                     <input class='upload-input' @change='changeCoverPic($event)' type='file' accept='image/gif,image/jpeg,image/jpg,image/png' />
                     <!-- 遮罩层 -->
                     <div class='upload-cover'>点击添加封面图</div>
@@ -30,6 +30,10 @@
                     <img class='upload-image' id='upload-image' />
                     <i class='icon-delete' style='cursor:pointer;' @click='deleteCoverPic'></i>
                 </template>
+            </div>
+            <!-- 文章简介 -->
+            <div class='intro'>
+                <textarea class='intro-input' v-model='articleInfo.intro' placeholder='输入文章简介...' maxlength="100"></textarea>
             </div>
             <!-- 分类 -->
             <div class='classification'>
@@ -50,6 +54,7 @@
 <script>
 import Header from '../../../components/Header'
 import Editor from '../../../components/Editor'
+import { writeArticle } from '../../../Api/api.js'
 export default {
     name:'Create',
     data(){
@@ -58,8 +63,10 @@ export default {
             articleInfo:{  // 文章信息
                 content:'',
                 title:'',
-                coverPic:'',
+                file:'',
                 classification:'',
+                intro:'',
+                mood:1  // 默认 1-smile
             },
         }
     },
@@ -76,13 +83,13 @@ export default {
         handleDialogClose:function(){
             // 清空
             this.articleInfo.title = ''
-            this.articleInfo.coverPic = ''
+            this.articleInfo.file = ''
             this.articleInfo.classification = ''
             this.submitDialog = false
         },
         // 上传封面图
         changeCoverPic:function(event){
-            this.articleInfo.coverPic = event.target.files[0]  // 获取图片
+            this.articleInfo.file = event.target.files[0]  // 获取图片
 
             // 创建 FileReader 对象
             var file = event.target.files[0]
@@ -96,16 +103,50 @@ export default {
         },
         // 删除封面图
         deleteCoverPic:function(){
-            this.articleInfo.coverPic = ''
+            this.articleInfo.file = ''
         },
         // 选择分类
         changeClassification:function(type){
             // 1-随笔   2-新闻   3-知识   4-沸点
             this.articleInfo.classification = type
         },
+        // 获取心情
+        getExpression(code){
+            this.mood = code
+            console.log(code)
+        },
         submitArticle:function(){
             this.articleInfo.content = this.$refs.editor.getContent()
             console.log(this.articleInfo)
+
+            let data = new FormData();
+
+            for(let i in this.articleInfo){
+                data.append(i,this.articleInfo[i])
+            }
+
+
+            writeArticle(data).then( res => {
+                console.log('writeArticleResponse:', res.data)
+                if(res.data.code == 0){
+                    this.$notify({
+                        title: 'Tips',
+                        message: '发布成功！',
+                        type: 'success',
+                        duration:3000
+                    })
+                    this.$router.push({
+                        path:'/'
+                    })
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
+            })
         }
     }
 }
@@ -152,10 +193,26 @@ export default {
             padding:5px;
             border:0;
             border-bottom:2px solid #f0932b;
+            display:flex;
             .title-input{
+                flex:1;
                 border:0;
                 color: #303952;
                 outline:none;
+            }
+        }
+        .intro{
+            margin-bottom:10px;
+            display:flex;
+            .intro-input{
+                flex:1;
+                height:70px;
+                padding:10px;
+                border:2px solid #f0932b;
+                border-radius:5px;
+                color: #303952;
+                outline:none;
+                resize: none;
             }
         }
         .upload{

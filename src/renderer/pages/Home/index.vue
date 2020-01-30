@@ -321,7 +321,7 @@ export default {
                if(res.data.code == 0){
                    this.$store.dispatch('setUser',res.data.data)
                    this.userInfo = res.data.data
-                   sessionStorage.setItem('currentUserInfo',this.userInfo)
+                   sessionStorage.setItem('currentUserInfo',JSON.stringify(this.userInfo))
                }else{
                    this.$notify({
                         title: 'Tips',

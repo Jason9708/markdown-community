@@ -118,7 +118,7 @@ export default {
                     code = 3
                     break
             }
-            this.$emit('getExpression',code)
+            this.$emit('getExpression',code)   // Code： 1-smile  2-normal  3-cry
         },
         // 获取当前系统时间  格式 Tue Dec 17 
         getCurrentDate(){

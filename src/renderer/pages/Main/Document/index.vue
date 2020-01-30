@@ -12,21 +12,24 @@
             <!-- 文章列表 -->
             <!-- 文章列表 -->
             <div class='article-list'>
-                <div class='article-item' v-for='(item,index) in 2' :key='index'> 
+                <div class='article-item' v-for='(item,index) in artcileList' :key='index'> 
                     <!-- 标题 -->
                     <div class='title'>
-                        你经历过哪些比较有意思的心理效应或现象？
+                        {{item.title}}
+                        <span class='classification'>
+                        {{getClassificationDes(item.classification)}}
+                        </span>
                     </div>
                     <!-- 作者 & 发布时间 -->
                     <div class='info'>
-                        <span class='name'>CHICAGO</span>
-                        <span class='time'>2019 12 23</span>
+                        <span class='name'>{{item.createUserName}}</span>
+                        <span class='time'>{{item.date | timeFormat}}</span>
                     </div>
                     <!-- 概要内容 -->
                     <div class='article'>
-                        <img class='coverPic' src='../../../assets/images/mock/1.jpg'>
+                        <img class='coverPic' v-if='item.coverPic' :src='global.articleCoverPath + item.coverPic'>
                         <span class='content'>
-                            人类对世界的理解是漫长的过程，我们很难还原最初的人类先民看到星空时，会有怎样的反应。但无疑许多原始的表现会长时间伴随着我们的演化，决定我们对外在世界的观感，例如星空：它们可能并不浪漫，而是代表了原始的恐惧。
+                            {{item.intro}}
                         </span>
                     </div>
                     <!-- 操作 -->
@@ -47,6 +50,7 @@
 </template>
 
 <script>
+import { getArticleListById } from '../../../Api/api.js'
 import anime from 'animejs'
 export default {
     name:'Document',
@@ -55,8 +59,12 @@ export default {
             showOperation:false, // 控制更多按钮是收回 / 展开  当false时点击则展开，当true时点击则为收缩
             // 上下页 按钮配置
             prev:'left',
-            next:'right'
+            next:'right',
+            artcileList:'' // 文章列表
         }
+    },
+    mounted(){
+        this.getArticleList()
     },
     methods:{
         /**
@@ -92,7 +100,37 @@ export default {
                 console.log('xxx')
                 el.classList.add('show-Operationlist')
             }
-        }
+        },
+        /**
+         * 根据id获取文章列表
+         * @id 创建者id 
+         */
+         getArticleList:function(){
+            var id = JSON.parse(sessionStorage.getItem('currentUserInfo'))._id
+            getArticleListById(id).then(res => {
+                console.log('getArticleListById:', res.data)
+                this.artcileList = res.data.data
+            })
+         },
+         // 根据classification获取对应分类名  1-随笔   2-新闻   3-知识   4-沸点
+         getClassificationDes:function(classification){
+            switch(classification){
+                case '1':
+                    return '随笔'
+                    break
+                case '2':
+                    return '新闻'
+                    break
+                case '3':
+                    return '知识'
+                    break
+                case '4':
+                    return '沸点'
+                    break
+                default:
+                    return ''
+            }
+         }
     }
 }
 </script>
@@ -211,7 +249,9 @@ export default {
                 display: flex;
                 flex-direction: column;
                 margin:10px 20px;
+                border-bottom:1px solid rgba(178,186,194,.15);
                 cursor:pointer;
+                width:90%;
                 &:first-child{
                     margin-top:30px;
                 }
@@ -223,6 +263,16 @@ export default {
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow:ellipsis;
+                    display:flex;
+                    align-items:center;
+                    .classification{
+                        margin-left:10px;
+                        padding:0px 5px;
+                        border-left:2px solid rgba(178,186,194,.15);
+                        color:#303952;
+                        font-size:10px;
+                        font-weight:100;
+                    }
                 }
                 .info{
                     margin-top:8px;
@@ -241,15 +291,16 @@ export default {
                 .article{
                     display:flex;
                     margin-top:15px;
+                    padding-bottom:20px;
                     .coverPic{
-                        margin:0px 20px 10px 0px;
-                        width: 120px;
-                        height:80px;
+                        margin:0px 20px 0px 0px;
+                        width: 100px;
+                        height:60px;
                         border-radius:5px;
                     }
                     .content{
                         flex:1;
-                        height:100px;
+                        max-height:60px;
                         font-size:13px;
                         line-height: 25px;
                         color:#303231;

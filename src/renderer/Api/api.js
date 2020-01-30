@@ -1,5 +1,7 @@
+// 😀 存放 Api 接口文件
+
 /**
- * 存放 Api 接口文件
+ * about User
  * @userRegister 注册接口
  *      registerInfo 注册表单数据
  * @userLogin 登录接口
@@ -36,5 +38,38 @@ export function updateUserInfo(userInfo) {
         url: '/hdgc/users/',
         data: userInfo,
         method: 'post',
+    })
+}
+
+
+/**
+ * about Article
+ * @writeArticle 写文章接口
+ *      articleInfo 文章表单数据
+ * @getArticleList 获取全部文章列表接口
+ * @getArticleListById 获取某人文章列表接口
+ *       通过创建人id
+ * @getArticleDetail 获取文章详情接口
+ *      通过文章id
+ * @deletArticle
+ *      通过文章id
+ * @updateArticle
+ *      修改文章
+ */
+export function writeArticle(articleInfo) {
+    return Axios({
+        url: '/hdgc/article',
+        data: articleInfo,
+        method: 'post',
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
+    })
+}
+
+export function getArticleListById(id) {
+    return Axios({
+        url: `/hdgc/article/${id}`,
+        method: 'get'
     })
 }
