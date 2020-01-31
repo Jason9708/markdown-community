@@ -31,6 +31,14 @@ const route = new Router({
                     component: require('@/pages/Main/Article/create.vue').default,
                 },
                 {
+                    path: '/detail',
+                    name: 'detail',
+                    meta: {
+                        title: '详情'
+                    },
+                    component: require('@/pages/Main/Article/detail.vue').default,
+                },
+                {
                     path: '/society',
                     name: 'society',
                     meta: {

@@ -73,3 +73,17 @@ export function getArticleListById(id) {
         method: 'get'
     })
 }
+
+export function getArticleDetail(id) {
+    return Axios({
+        url: `/hdgc/article/articleInfo/${id}`,
+        method: 'get'
+    })
+}
+
+export function deletArticleById(id) {
+    return Axios({
+        url: `/hdgc/article/${id}`,
+        method: 'delete'
+    })
+}

@@ -2,17 +2,17 @@
     <div class='document-wrapper'>
         <div class='main-container'>
             <!--上一页-->
-            <div class='PREV' @click='Prev'>
+            <div class='PREV' @click='Prev' v-if='showPrev'>
                 <i class='icon-left'></i>
             </div>
             <!--下一页-->
-            <div class='NEXT' @click='Next'>
+            <div class='NEXT' @click='Next' v-if='showNext'>
                 <i class='icon-right'></i>
             </div>
             <!-- 文章列表 -->
             <!-- 文章列表 -->
             <div class='article-list'>
-                <div class='article-item' v-for='(item,index) in artcileList' :key='index'> 
+                <div class='article-item' v-for='(item,index) in artcileList' :key='index' @click='goArticleDetail(item)'> 
                     <!-- 标题 -->
                     <div class='title'>
                         {{item.title}}
@@ -37,7 +37,7 @@
                         <div class='operation-list'>
                             <i class='icon-like' style='margin-right:10px;cursor:pointer;'></i>
                             <i class='icon-comment' style='margin-right:10px;cursor:pointer;'></i>
-                            <i class='icon-delete' style='cursor:pointer;'></i>
+                            <i class='icon-delete' style='cursor:pointer;' @click='deleteArticle(item)'></i>
                         </div>
                         <div class='more' style='cursor:pointer;' @click='tiggerOperationAnime(index)'>
                             <i class='icon-more'></i>
@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { getArticleListById } from '../../../Api/api.js'
+import { getArticleListById, deletArticleById } from '../../../Api/api.js'
 import anime from 'animejs'
 export default {
     name:'Document',
@@ -60,11 +60,29 @@ export default {
             // 上下页 按钮配置
             prev:'left',
             next:'right',
-            artcileList:'' // 文章列表
+            AllartcileList:[], // 文章列表
+            artcileList:[],  // 当前显示文章列表
+            page:1, // 当前页数
         }
     },
     mounted(){
         this.getArticleList()
+    },
+    computed:{
+        showPrev(){
+            if(this.page <= 1){
+                return false
+            }else{
+                return true
+            }
+        },
+        showNext(){
+            if(this.page * 4 < this.AllartcileList.length){
+                return true
+            }else{
+                return false
+            }
+        }
     },
     methods:{
         /**
@@ -73,8 +91,31 @@ export default {
          * @Next 下一页点击事件  
          */
         Prev:function(){
+            this.artcileList = []
+            this.page--
+            for(let i = (this.page - 1) * 4; i < this.page * 4; i++){
+                if(this.AllartcileList[i]){
+                    this.artcileList.push(this.AllartcileList[i])
+                }
+            }
+            var el = document.getElementsByClassName('operation-list')
+            for(let i = 0; i < el.length; i++){
+                console.log()
+                el[i].classList.remove('show-Operationlist')
+            }
         },
         Next:function(){
+            this.artcileList = []
+            this.page++
+            for(let i = (this.page - 1) * 4; i < this.page * 4; i++){
+                if(this.AllartcileList[i]){
+                    this.artcileList.push(this.AllartcileList[i])
+                }
+            }
+            var el = document.getElementsByClassName('operation-list')
+            for(let i = 0; i < el.length; i++){
+                el[i].classList.remove('show-Operationlist')
+            }
         },
         /**
          * 文章操作逻辑
@@ -94,10 +135,8 @@ export default {
                 }
             }
             if(flag){
-                console.log('hhh')
                 el.classList.remove('show-Operationlist')
             }else{
-                console.log('xxx')
                 el.classList.add('show-Operationlist')
             }
         },
@@ -109,11 +148,26 @@ export default {
             var id = JSON.parse(sessionStorage.getItem('currentUserInfo'))._id
             getArticleListById(id).then(res => {
                 console.log('getArticleListById:', res.data)
-                this.artcileList = res.data.data
+                if(res.data.code == 0){
+                    this.AllartcileList = res.data.data
+                    this.artcileList = []
+                    for(let i = (this.page - 1) * 4; i < this.page * 4; i++){
+                        if(this.AllartcileList[i]){
+                            this.artcileList.push(this.AllartcileList[i])
+                        }
+                    }
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
             })
          },
-         // 根据classification获取对应分类名  1-随笔   2-新闻   3-知识   4-沸点
-         getClassificationDes:function(classification){
+        // 根据classification获取对应分类名  1-随笔   2-新闻   3-知识   4-沸点
+        getClassificationDes:function(classification){
             switch(classification){
                 case '1':
                     return '随笔'
@@ -130,7 +184,36 @@ export default {
                 default:
                     return ''
             }
-         }
+        },
+        // 删除文章
+        deleteArticle(item){
+            deletArticleById(item._id).then(res => {
+                if(res.data.code == 0){
+                    this.page = 1
+                    this.getArticleList()
+                    var el = document.getElementsByClassName('operation-list')
+                    for(let i = 0; i < el.length; i++){
+                        el[i].classList.remove('show-Operationlist')
+                    }
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
+            })
+        },
+        // 跳转详情页
+        goArticleDetail:function(item){
+            this.$router.push({
+                path:'/detail',
+                query:{
+                    id:item._id
+                }
+            })
+        }
     }
 }
 </script>
@@ -267,7 +350,7 @@ export default {
                     align-items:center;
                     .classification{
                         margin-left:10px;
-                        padding:0px 5px;
+                        padding:0px 10px;
                         border-left:2px solid rgba(178,186,194,.15);
                         color:#303952;
                         font-size:10px;
@@ -300,7 +383,7 @@ export default {
                     }
                     .content{
                         flex:1;
-                        max-height:60px;
+                        height:60px;
                         font-size:13px;
                         line-height: 25px;
                         color:#303231;
