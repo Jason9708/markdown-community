@@ -5,7 +5,7 @@
         <div class='create-submit' @click='beforeSubmit'>
             发布
         </div>
-        <Editor class='editor' ref='editor'></Editor>
+        <Editor class='editor' ref='editor' @handleEditorImgAdd='handleEditorImgAdd'></Editor>
         <!-- 提交弹窗 -->
         <el-dialog
             title="发布文章"
@@ -54,7 +54,7 @@
 <script>
 import Header from '../../../components/Header'
 import Editor from '../../../components/Editor'
-import { writeArticle } from '../../../Api/api.js'
+import { writeArticle, editorUpload } from '../../../Api/api.js'
 export default {
     name:'Create',
     data(){
@@ -145,6 +145,36 @@ export default {
                         type: 'error',
                         duration:3000
                     })
+                }
+            })
+        },
+        // 编辑器文件上传
+        handleEditorImgAdd:function(pos, $file){
+            console.log('hhh')
+            let formdata = new FormData()
+            formdata.append('file', $file)
+            editorUpload(formdata).then(res => {
+                console.log('editorUpload:',res)
+                if(res.data.code == 0){
+                    let url = this.global.markdownPicPath + res.data.data
+                    console.log('url:', url)
+                    let name = $file.name
+                    if (name.includes('-')) {
+                        name = name.replace(/-/g, '')
+                    }
+                    let content = this.$refs.editor.getContent()
+                    // 第二步.将返回的url替换到文本原位置![...](0) -> ![...](url)  这里是必须要有的
+                    if (content.includes(name)) {
+                        let oStr = `(${pos})`
+                        let nStr = `(${url})`
+                        let index = content.indexOf(oStr)
+                        let str = content.replace(oStr, '')
+                        let insertStr = (soure, start, newStr) => {
+                            return soure.slice(0, start) + newStr + soure.slice(start)
+                        }
+                        this.$refs.editor.mavonEditor.content = insertStr(str, index, nStr)
+                        console.log(this.$refs.editor.mavonEditor.content)
+                    }
                 }
             })
         }

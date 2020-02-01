@@ -209,4 +209,24 @@ export default {
         }
     }
 }
+
+// 滚动条样式覆盖
+.main-container::-webkit-scrollbar {
+    width: 3px;
+    margin:2px;
+    height: 5px;
+}
+.main-container::-webkit-scrollbar-button {
+    display: none;
+}
+.main-container::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+.main-container::-webkit-scrollbar-thumb {
+    width: 1px;
+    background: linear-gradient(to right top, #ffbe76, #f0932b);
+    -webkit-border-radius: 10em;
+    -moz-border-radius: 10em;
+    border-radius: 10em;
+}
 </style>

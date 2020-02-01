@@ -1,5 +1,6 @@
 const avatarPath = 'http://localhost:5000/hdgc/upload/images/avatar/' // 头像地址前缀
 const articleCoverPath = 'http://localhost:5000/hdgc/article/images/articleCover/' // 头像地址前缀
+const markdownPicPath = 'http://localhost:5000/hdgc/article/images/markdownPic/' // 头像地址前缀
 
 
 /**
@@ -7,5 +8,6 @@ const articleCoverPath = 'http://localhost:5000/hdgc/article/images/articleCover
  */
 export default {
     avatarPath: avatarPath,
-    articleCoverPath: articleCoverPath
+    articleCoverPath: articleCoverPath,
+    markdownPicPath: markdownPicPath
 }

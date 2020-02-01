@@ -5,7 +5,7 @@
 -->
 <template>
     <div class='markdown-container'>
-        <mavon-editor v-model='mavonEditor.content' :boxShadow='mavonEditor.boxShadow' :fontSize='mavonEditor.fontSize' :placeholder='mavonEditor.placeholder' :toolbars='mavonEditor.toolbars'/>
+        <mavon-editor v-model='mavonEditor.content' :boxShadow='mavonEditor.boxShadow' :fontSize='mavonEditor.fontSize' :placeholder='mavonEditor.placeholder' :toolbars='mavonEditor.toolbars' @imgAdd="handleEditorImgAdd"/>
     </div>
 </template>
 
@@ -17,6 +17,7 @@ export default {
             // 富文本配置
             mavonEditor:{
                 content:'',
+                imgFile:{},
                 boxShadow:false,
                 fontSize:'13px',
                 placeholder:'Write down your story',
@@ -64,7 +65,17 @@ export default {
         // 获取当前文章内容
         getContent:function(){
             return this.mavonEditor.content
-        }
+        },
+        handleEditorImgAdd:function(pos, $file){
+            console.log(pos)
+            console.log($file)
+            this.mavonEditor.imgFile[pos] = $file
+            this.$emit('handleEditorImgAdd', pos, $file)
+        },
+        handleEditorImgDel (pos) {
+            delete this.imgFile[pos]
+            this.$emit('handleEditorImgDel', pos)
+        },
     }
 }
 </script>

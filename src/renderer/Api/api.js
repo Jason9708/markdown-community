@@ -67,6 +67,17 @@ export function writeArticle(articleInfo) {
     })
 }
 
+export function editorUpload(formdata) {
+    return Axios({
+        url: '/hdgc/article/markdownPic',
+        data: formdata,
+        method: 'post',
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
+    })
+}
+
 export function getArticleListById(id) {
     return Axios({
         url: `/hdgc/article/${id}`,
