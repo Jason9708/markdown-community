@@ -245,7 +245,7 @@ export default {
             background: #EDEDED;
             font-size:14px;
             font-weight: 600;
-            border-radius:15px;
+            border-radius:5px;
             cursor: pointer;
             margin:10px 0px 20px 0px;
             transition:all .5s ease;

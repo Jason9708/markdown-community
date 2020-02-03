@@ -3,7 +3,7 @@
         <div class='Home-container'>
             <div class='container-right'>
                 <!-- 右侧个人信息展示栏 -->
-                <div class='information-box' v-if='isLogin'>
+                <div class='information-box' v-if='isLogin' @click.stop='goPersonDetail'>
                     <!-- 搜索按钮 -->
                     <i class='icon-search' style='position:absolute;top:5px;right:5px;cursor:pointer;' @click='showSearchBox = true'></i>
                     <!-- 个人主要信息：头像、昵称、签名 -->
@@ -34,17 +34,10 @@
                     <!-- 切换注册框图标按钮 -->
                     <i class='icon-register' style='position:absolute;top:10px;right:10px;cursor:pointer;color:#303952;' @click='turnRegisterClick'></i>
                     <div class='input-box'>
-                        <!-- 动态线 -->
-                        <div class='dynamicLine'></div>
-                        <input class='INPUT' id='username' v-model='loginInfo.username' placeholder='username' style='margin-bottom:10px;' @click.stop='inputAnime'>
-                        <input class='INPUT' id='password' v-model='loginInfo.password' type='password'  @click.stop='inputAnime' placeholder='password' >
+                        <input class='INPUT' id='username' v-model='loginInfo.username' placeholder='Username' style='margin-bottom:20px;' >
+                        <input class='INPUT' id='password' v-model='loginInfo.password' type='password' placeholder='Password' >
                         <div class='BUTTON' @click='signinClcik'>
-                            <div class='LOADING'>
-                                <!-- 遮罩物 -->
-                                <div class='hide'>
-                                </div>
-                            </div>
-                            <div class='word'>SIGN IN</div>
+                            <el-button type="warning" :loading="btnLoading" size="mini">Login</el-button>
                         </div>
                     </div>
                 </div>
@@ -54,17 +47,10 @@
                     <!-- 切换登录框图标按钮 -->
                     <i class='icon-login' style='position:absolute;top:10px;right:10px;cursor:pointer;color:#303952;' @click='turnLoginClick'></i>
                     <div class='input-box'>
-                        <!-- 动态线 -->
-                        <div class='dynamicLine'></div>
-                        <input class='INPUT' id='username' v-model='registerInfo.username' placeholder='username' style='margin-bottom:10px;' @click.stop='inputAnime'>
-                        <input class='INPUT' id='password' v-model='registerInfo.password'  @click.stop='inputAnime' placeholder='password' >
+                        <input class='INPUT' id='username' v-model='registerInfo.username' placeholder='Username' style='margin-bottom:20px;'>
+                        <input class='INPUT' id='password' v-model='registerInfo.password' placeholder='Password' type='password'>
                         <div class='BUTTON' @click='registerClick'>
-                            <div class='LOADING'>
-                                <!-- 遮罩物 -->
-                                <div class='hide'>
-                                </div>
-                            </div>
-                            <div class='word'>REGISTER</div>
+                            <el-button type="warning" :loading="btnLoading" size="mini">Register</el-button>
                         </div>
                     </div>
                 </div>
@@ -134,6 +120,9 @@ export default {
             // 显示与隐藏配置
             showSearchBox:false,
             showRegister:false,
+
+            // 控制按钮加载
+            btnLoading:false
         }
     },
     computed:{
@@ -181,7 +170,7 @@ export default {
             })
         },
         /**
-         * Animie 
+         * Animie  禁用
          * @inputAnime - 输入框动画
          * @loadingAnime - 加载动画
          */
@@ -261,7 +250,8 @@ export default {
          * @openUrl - 链接跳转
          */
          signinClcik:function(){
-            this.loadingAnime()
+            // this.loadingAnime() - 禁用
+            this.btnLoading = true
             userLogin(this.loginInfo).then( res => {
                 if(res.data.code == 0){
                     // 获取 token 存入缓存
@@ -278,12 +268,14 @@ export default {
                         type: 'error',
                         duration:3000
                     })
-                    anime.remove('.LOADING')
+                    // anime.remove('.LOADING')
                 }
+                this.btnLoading = false
             })
          },
          registerClick:function(){
-            this.loadingAnime()
+            // this.loadingAnime() - 禁用
+            this.btnLoading = true
             userRegister(this.registerInfo).then( res => {
                 if(res.data.code == 0){
                     this.showRegister = false
@@ -301,6 +293,7 @@ export default {
                         duration:3000
                     });
                 }
+                this.btnLoading = false
             })
          },
          turnRegisterClick:function(){
@@ -330,6 +323,16 @@ export default {
                         duration:3000
                     });
                }
+            })
+        },
+        // 跳转人物详情
+        goPersonDetail(){
+            var id = JSON.parse(sessionStorage.getItem('currentUserInfo'))._id
+            this.$router.push({
+                path:'/personDetail',
+                query:{
+                    id: id
+                }
             })
         }
     }
@@ -498,54 +501,26 @@ export default {
                         color:#303952;
                         font-size:12px;
                         font-weight:600;
-                        padding:5px 20px;
+                        padding:2px 20px;
                         width:150px;
                         height:20px;
                         border:0px;
                         outline:none;
+                        font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+                        border-left:3px solid rgba(178,186,194,.3);
+                        transition:all .5s linear;
+                        &:focus{
+                            border-left:3px solid rgba(243, 156, 18,.7);
+                        }
                     }
                     .BUTTON{
                         margin-top:30px;
-                        position: relative;
-                        display: flex;
-                        flex-wrap:wrap;
-                        justify-content: center;
-                        align-items: center;
-                        width:150px;
-                        height:30px;
-                        color:#ffbe76;
-                        cursor:pointer;
-                        transition:all .5s ease;
-                        .word{
-                            position: absolute;
-                            font-size:14px;
-                            font-weight:600;
-                            font-family:'Microsoft JhengHei',"Open Sans", Helvetica, Arial, sans-serif;
-                            letter-spacing:1px;
-                            z-index:2;
+                        .el-button{
+                            width:130px;
+                            font-weight:normal;
+                            font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+                            transition:all .3s linear;
                         }
-                        .LOADING{
-                            position:absolute;
-                            top:7px;
-                            left:20px;
-                            width:12px;
-                            height:12px;
-                            border-radius:50%;
-                            border:2px solid #ffbe76;
-                            opacity:0;
-                            .hide{
-                                position:absolute;
-                                top:2.5px;
-                                left:-2px;
-                                width:20px;
-                                height:5px;
-                                background:#fff;
-                            }
-                            
-                        }
-                    }
-                    .BUTTON:hover {
-                        color:#f0932b;
                     }
                 }
             }
@@ -579,55 +554,27 @@ export default {
                     .INPUT{
                         color:#303952;
                         font-size:12px;
-                        font-weight:600;
-                        padding:5px 20px;
+                        font-weight:500;
+                        padding:2px 20px;
                         width:150px;
                         height:20px;
                         border:0px;
                         outline:none;
+                        font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+                        border-left:3px solid rgba(178,186,194,.3);
+                        transition:all .5s linear;
+                        &:focus{
+                            border-left:3px solid rgba(243, 156, 18,.7);
+                        }
                     }
                     .BUTTON{
                         margin-top:30px;
-                        position: relative;
-                        display: flex;
-                        flex-wrap:wrap;
-                        justify-content: center;
-                        align-items: center;
-                        width:150px;
-                        height:30px;
-                        color:#ffbe76;
-                        cursor:pointer;
-                        transition:all .5s ease;
-                        .word{
-                            position: absolute;
-                            font-size:14px;
-                            font-weight:600;
-                            font-family:'Microsoft JhengHei',"Open Sans", Helvetica, Arial, sans-serif;
-                            letter-spacing:1px;
-                            z-index:2;
+                        .el-button{
+                            width:130px;
+                            font-weight:normal;
+                            font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+                            transition:all .3s linear;
                         }
-                        .LOADING{
-                            position:absolute;
-                            top:7px;
-                            left:15px;
-                            width:12px;
-                            height:12px;
-                            border-radius:50%;
-                            border:2px solid #ffbe76;
-                            opacity:0;
-                            .hide{
-                                position:absolute;
-                                top:2.5px;
-                                left:-2px;
-                                width:20px;
-                                height:5px;
-                                background:#fff;
-                            }
-                            
-                        }
-                    }
-                    .BUTTON:hover {
-                        color:#f0932b;
                     }
                 }
             }
@@ -649,6 +596,7 @@ export default {
             display:flex;
             justify-content:center;
             margin:30px;
+            font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
             .btn-group{
                 display:flex;
                 justify-content:center;

@@ -25,6 +25,9 @@
                 <el-input v-model="userInfo.email">
                     <template slot="prepend">邮箱</template>
                 </el-input>
+                <el-input v-model="userInfo.wechat">
+                    <template slot="prepend">微信</template>
+                </el-input>
                 <el-input v-model="userInfo.weibo">
                     <template slot="prepend">微博</template>
                 </el-input>

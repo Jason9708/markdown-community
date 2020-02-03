@@ -33,8 +33,8 @@ export default {
                     quote: true, // 引用
                     ol: true, // 有序列表
                     ul: true, // 无序列表
-                    link: true, // 链接
-                    imagelink: true, // 图片链接
+                    link: false, // 链接
+                    imagelink: false, // 图片链接
                     code: true, // code
                     table: true, // 表格
                     fullscreen: true, // 全屏编辑
@@ -44,7 +44,7 @@ export default {
                     undo: false, // 上一步
                     redo: false, // 下一步
                     trash: true, // 清空
-                    save: true, // 保存（触发events中的save事件）
+                    save: false, // 保存（触发events中的save事件）
                     navigation: true, // 导航目录
                     alignleft: true, // 左对齐
                     aligncenter: true, // 居中

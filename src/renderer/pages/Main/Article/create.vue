@@ -150,14 +150,12 @@ export default {
         },
         // 编辑器文件上传
         handleEditorImgAdd:function(pos, $file){
-            console.log('hhh')
             let formdata = new FormData()
             formdata.append('file', $file)
             editorUpload(formdata).then(res => {
                 console.log('editorUpload:',res)
                 if(res.data.code == 0){
                     let url = this.global.markdownPicPath + res.data.data
-                    console.log('url:', url)
                     let name = $file.name
                     if (name.includes('-')) {
                         name = name.replace(/-/g, '')
@@ -193,12 +191,13 @@ export default {
 .create-wrapper{
     width:100%;
     height:100%;
-    overflow-y:screen;
+    overflow:auto;
     display:flex;
     flex-direction: column;
     position:relative;
     .header-component{
         padding:30px 0px 10px 30px;
+        min-height:120px;
     }
     .create-submit{
         position:absolute;
@@ -340,5 +339,25 @@ export default {
         font-size:14px;
         color:#303952;
     }
+}
+
+// 滚动条样式覆盖
+.create-wrapper::-webkit-scrollbar {
+    width: 3px;
+    margin:2px;
+    height: 5px;
+}
+.create-wrapper::-webkit-scrollbar-button {
+    display: none;
+}
+.create-wrapper::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+.create-wrapper::-webkit-scrollbar-thumb {
+    width: 1px;
+    background: linear-gradient(to right top, #ffbe76, #f0932b);
+    -webkit-border-radius: 10em;
+    -moz-border-radius: 10em;
+    border-radius: 10em;
 }
 </style>

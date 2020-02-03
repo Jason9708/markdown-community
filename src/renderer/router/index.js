@@ -63,13 +63,21 @@ const route = new Router({
                     component: require('@/pages/Main/Profile/index.vue').default,
                 }
             ]
+        },
+        {
+            path: '/personDetail',
+            name: 'PersonDetail',
+            meta: {
+                title: '用户详情'
+            },
+            component: require('@/pages/Main/personDetail.vue').default
         }
     ]
 })
 
 route.beforeEach((to, from, next) => {
     // 若返回首页以及社区，无须鉴权
-    if (to.path == '/' || to.path == '/society') {
+    if (to.path == '/' || to.path == '/society' || to.path == '/personDetail') {
         next()
     } else {
         /**

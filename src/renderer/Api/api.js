@@ -41,6 +41,13 @@ export function updateUserInfo(userInfo) {
     })
 }
 
+export function getPersonInfo(userId) {
+    return Axios({
+        url: `/hdgc/users/${userId}`,
+        method: 'get'
+    })
+}
+
 
 /**
  * about Article
