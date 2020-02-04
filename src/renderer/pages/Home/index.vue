@@ -5,7 +5,7 @@
                 <!-- 右侧个人信息展示栏 -->
                 <div class='information-box' v-if='isLogin' @click.stop='goPersonDetail'>
                     <!-- 搜索按钮 -->
-                    <i class='icon-search' style='position:absolute;top:5px;right:5px;cursor:pointer;' @click='showSearchBox = true'></i>
+                    <i class='icon-search' style='position:absolute;top:5px;right:5px;cursor:pointer;' @click.stop='showSearchBox = true'></i>
                     <!-- 个人主要信息：头像、昵称、签名 -->
                     <div class='main'>
                         <img class='avator' :src="userInfo.avatar ? global.avatarPath + userInfo.avatar : default_headPic"></img>
@@ -293,14 +293,20 @@ export default {
                         duration:3000
                     });
                 }
+                this.registerInfo.username = ''
+                this.registerInfo.password = ''
                 this.btnLoading = false
             })
          },
          turnRegisterClick:function(){
             this.showRegister = true
+            this.loginInfo.username = ''
+            this.loginInfo.password = ''
          },
          turnLoginClick:function(){
             this.showRegister = false
+            this.registerInfo.username = ''
+            this.registerInfo.password = ''
          },
          openUrl:function(url){
              window.open(url)

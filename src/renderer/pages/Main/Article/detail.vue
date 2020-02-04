@@ -12,7 +12,7 @@
                     </div>
                     <!-- 用户信息 -->
                     <div class='info-user'>
-                        <img class='info-userAvatar' v-if='artcileData.createUserAvatar' :src='artcileData.createUserAvatar ? global.avatarPath + artcileData.createUserAvatar : default_headPic'>
+                        <img class='info-userAvatar' v-if='artcileData.createUserAvatar' :src='artcileData.createUserAvatar ? global.avatarPath + artcileData.createUserAvatar : default_headPic' @click='goPersonDetail'>
                         <!-- 用户姓名 公司 职业 -->
                         <div class='info-user-container'>
                             <span class='info-user-name'>{{artcileData.createUserName}}</span>
@@ -93,6 +93,15 @@ export default {
                     return ''
             }
         },
+        goPersonDetail:function(){
+            var id = this.artcileData.createUserId
+            this.$router.push({
+                path:'/personDetail',
+                query:{
+                    id: id
+                }
+            })
+        }
     }
 }
 </script>
@@ -182,6 +191,7 @@ export default {
                         width:50px;
                         height:50px;
                         border-radius:5px;
+                        cursor:pointer;
                     }
                     .info-user-container{
                         display:flex;

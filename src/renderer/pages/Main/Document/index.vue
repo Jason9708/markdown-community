@@ -12,7 +12,7 @@
             <!-- 文章列表 -->
             <!-- 文章列表 -->
             <div class='article-list'>
-                <div class='article-item' v-for='(item,index) in artcileList' :key='index' @click='goArticleDetail(item)'> 
+                <div class='article-item' v-for='(item,index) in articleList' :key='index' @click='goArticleDetail(item)'> 
                     <!-- 标题 -->
                     <div class='title'>
                         {{item.title}}
@@ -61,7 +61,7 @@ export default {
             prev:'left',
             next:'right',
             AllartcileList:[], // 文章列表
-            artcileList:[],  // 当前显示文章列表
+            articleList:[],  // 当前显示文章列表
             page:1, // 当前页数
         }
     },
@@ -91,11 +91,11 @@ export default {
          * @Next 下一页点击事件  
          */
         Prev:function(){
-            this.artcileList = []
+            this.articleList = []
             this.page--
             for(let i = (this.page - 1) * 4; i < this.page * 4; i++){
                 if(this.AllartcileList[i]){
-                    this.artcileList.push(this.AllartcileList[i])
+                    this.articleList.push(this.AllartcileList[i])
                 }
             }
             var el = document.getElementsByClassName('operation-list')
@@ -105,11 +105,11 @@ export default {
             }
         },
         Next:function(){
-            this.artcileList = []
+            this.articleList = []
             this.page++
             for(let i = (this.page - 1) * 4; i < this.page * 4; i++){
                 if(this.AllartcileList[i]){
-                    this.artcileList.push(this.AllartcileList[i])
+                    this.articleList.push(this.AllartcileList[i])
                 }
             }
             var el = document.getElementsByClassName('operation-list')
@@ -144,16 +144,16 @@ export default {
          * 根据id获取文章列表
          * @id 创建者id 
          */
-         getArticleList:function(){
+        getArticleList:function(){
             var id = JSON.parse(sessionStorage.getItem('currentUserInfo'))._id
             getArticleListById(id).then(res => {
                 console.log('getArticleListById:', res.data)
                 if(res.data.code == 0){
                     this.AllartcileList = res.data.data
-                    this.artcileList = []
+                    this.articleList = []
                     for(let i = (this.page - 1) * 4; i < this.page * 4; i++){
                         if(this.AllartcileList[i]){
-                            this.artcileList.push(this.AllartcileList[i])
+                            this.articleList.push(this.AllartcileList[i])
                         }
                     }
                 }else{
@@ -165,7 +165,7 @@ export default {
                     })
                 }
             })
-         },
+        },
         // 根据classification获取对应分类名  1-随笔   2-新闻   3-知识   4-沸点
         getClassificationDes:function(classification){
             switch(classification){
@@ -335,6 +335,10 @@ export default {
                 border-bottom:1px solid rgba(178,186,194,.15);
                 cursor:pointer;
                 width:90%;
+                transition:all .2s linear;
+                &:hover{
+                    border-bottom:1px solid rgba(178,186,194,.7);
+                }
                 &:first-child{
                     margin-top:30px;
                 }

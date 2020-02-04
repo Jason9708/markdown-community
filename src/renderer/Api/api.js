@@ -53,9 +53,12 @@ export function getPersonInfo(userId) {
  * about Article
  * @writeArticle 写文章接口
  *      articleInfo 文章表单数据
- * @getArticleList 获取全部文章列表接口
+ * @editorUpload 写文章上传图片接口
+ * @getAllArticleList 获取全部文章列表接口
  * @getArticleListById 获取某人文章列表接口
  *       通过创建人id
+ * @getArticleListByIdAndType 获取某人某类型文章列表接口
+ *       通过创建人id + 文章分类type
  * @getArticleDetail 获取文章详情接口
  *      通过文章id
  * @deletArticle
@@ -85,9 +88,23 @@ export function editorUpload(formdata) {
     })
 }
 
+export function getAllArticleList() {
+    return Axios({
+        url: `/hdgc/article/`,
+        method: 'get'
+    })
+}
+
 export function getArticleListById(id) {
     return Axios({
         url: `/hdgc/article/${id}`,
+        method: 'get'
+    })
+}
+
+export function getArticleListByIdAndType(id, type) {
+    return Axios({
+        url: `/hdgc/article/getArticleListByIdAndType/${id}/${type}`,
         method: 'get'
     })
 }
@@ -103,5 +120,27 @@ export function deletArticleById(id) {
     return Axios({
         url: `/hdgc/article/${id}`,
         method: 'delete'
+    })
+}
+
+
+/**
+ * about follow
+ * @getUserFollowInfo 获取某用户关注信息
+ *      id 用户id
+ */
+
+export function getUserFollowInfo(id) {
+    return Axios({
+        url: `/hdgc/follow/${id}`,
+        method: 'get'
+    })
+}
+
+export function followPerson(data) {
+    return Axios({
+        url: `/hdgc/follow`,
+        data: data,
+        method: 'post'
     })
 }
