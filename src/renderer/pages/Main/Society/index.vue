@@ -45,7 +45,7 @@
                         <div class='operation-list'>
                             <i class='icon-like' style='margin-right:10px;cursor:pointer;'></i>
                             <i class='icon-comment' style='margin-right:10px;cursor:pointer;'></i>
-                            <i class='icon-delete' style='cursor:pointer;'></i>
+                            <i class='icon-delete' style='cursor:pointer;' @click.stop='deleteArticle(item)'></i>
                         </div>
                         <div class='more' style='cursor:pointer;' @click.stop='tiggerOperationAnime(index)'>
                             <i class='icon-more'></i>

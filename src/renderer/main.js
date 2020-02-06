@@ -17,11 +17,9 @@ Vue.prototype.global = global
 // 全局过滤器
 Vue.filter('timeFormat', function(date) {
     var time = new Date(date)
-    console.log(time)
     var year = time.getFullYear()
     var month = time.getMonth() + 1
     var day = time.getDate()
-    console.log(year, month, day)
     return `${year}-${month}-${day}`
 })
 

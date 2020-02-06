@@ -5,7 +5,7 @@
       <!-- <i class="el-icon-copy-document" style='margin-right:20px;cursor:pointer;-webkit-app-region: no-drag;' @click="operate('max')"></i> -->
       <i class="el-icon-close" style='margin-right:20px;cursor:pointer;-webkit-app-region: no-drag;' @click="operate('close')"></i>
     </div>
-    <router-view v-loading='Loading'></router-view>
+    <router-view v-loading='Loading' :key='key'></router-view>
   </div>
 </template>
 
@@ -16,8 +16,12 @@
     computed:{
       Loading:function(){
         return this.$store.state.loading
+      },
+      key:function(){
+          //解决同一组件路由跳转，数据不刷新问题
+          return this.$route.name !== undefined ? this.$route.name + new Date() : this.$route + new Date()
       }
-    },
+    }, 
     methods:{
       operate:function(operate){
         ipc.send(operate)

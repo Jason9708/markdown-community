@@ -128,6 +128,12 @@ export function deletArticleById(id) {
  * about follow
  * @getUserFollowInfo 获取某用户关注信息
  *      id 用户id
+ * @followPerson 关注某人
+ *      data：noticerId-关注人的Id | followId-被关注人的Id
+ * @unfollowPerson 取消关注某人
+ *      data：id-操作人id | followId-被取消关注人的Id 
+ * @getFollow 获取某人关注列表
+ *      id 用户id
  */
 
 export function getUserFollowInfo(id) {
@@ -139,7 +145,60 @@ export function getUserFollowInfo(id) {
 
 export function followPerson(data) {
     return Axios({
-        url: `/hdgc/follow`,
+        url: '/hdgc/follow/follow',
+        data: data,
+        method: 'post'
+    })
+}
+
+export function unfollowPerson(data) {
+    return Axios({
+        url: '/hdgc/follow/unfollow',
+        data: data,
+        method: 'post'
+    })
+}
+
+export function getFollow(id) {
+    return Axios({
+        url: `/hdgc/follow/follow/${id}`,
+        method: 'get'
+    })
+}
+
+export function getNoticer(id) {
+    return Axios({
+        url: `/hdgc/follow/noticer/${id}`,
+        method: 'get'
+    })
+}
+
+
+/**
+ * about comment
+ * @getCommentList 获取某文章评论列表
+ *      id 文章id
+ * @sendMainComment 为某文章发布主评论
+ */
+
+export function getCommentList(id) {
+    return Axios({
+        url: `/hdgc/comment/${id}`,
+        method: 'get'
+    })
+}
+
+export function sendMainComment(data) {
+    return Axios({
+        url: '/hdgc/comment/',
+        data: data,
+        method: 'post'
+    })
+}
+
+export function sendSonComment(id, data) {
+    return Axios({
+        url: `/hdgc/comment/comment/${id}`,
         data: data,
         method: 'post'
     })

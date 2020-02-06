@@ -1,6 +1,6 @@
 <!-- 用户详情 -->
 <template>
-    <div class='personDetail-wrapper'>
+    <div class='personDetail-wrapper' v-loading='Loading'>
         <div class='btn-return' @click='goBack'><i class='icon-return'></i></div>
         <div class='personDetail-header'>
             <!-- 左侧个人信息 -->
@@ -70,12 +70,12 @@
                     <span style='margin:0 0 0px 0;color:rgb(114, 119, 123);font-size:12px;display:flex;align-items:center;'><i class='icon-wechat'></i>{{personInfo.wechat}}</span>
                     <!-- 用户关注 & 被关注信息 -->
                     <div class='personDetail-main-right-bottom'>
-                        <div class='follow-info'>
+                        <div class='follow-info' @click='showFollowList'>
                             <span>Follow</span>
                             <span style='font-size:14px;font-weight:700;'>{{followList.follow ? followList.follow.length : '0'}}</span>
                         </div>
                         <el-divider direction="vertical"></el-divider>
-                        <div class='follow-info'>
+                        <div class='follow-info' @click='showNoticerList'>
                             <span>Noticer</span>
                             <span style='font-size:14px;font-weight:700;'>{{followList.noticer ? followList.noticer.length : '0'}}</span>
                         </div>
@@ -83,11 +83,42 @@
                 </div>
             </div>
         </div>
+
+
+        <!-- 弹窗 -->
+        <el-dialog
+            :title="dialogTitle"
+            :visible.sync="dialogVisible"
+            width="40%"
+            :before-close="beforeDialogClose">
+                <div class='follow-list'>
+                    <template v-if="dialogTitle === 'Follow'">
+                        <div class='follow-item' v-for='(item, index) in followArray' :key='index' @click='goPersonDetail(item)'>
+                            <img class='avatar' :src="item.avatar ? global.avatarPath + item.avatar : default_headPic">
+                            <div class='info'>
+                                <span style='margin:0 0 5px 15px;font-size:14px;font-weight:700;'>{{item.nickname ? item.nickname : item.username}}</span>
+                                <span style='margin:0 0 2px 15px;color:rgb(114, 119, 123);font-size:11px;display:flex;align-items:center'><i class='icon-profession' style='margin-right:5px;'></i>{{item.profession}}</span>
+                                <span style='margin:0 0 2px 15px;color:rgb(114, 119, 123);font-size:11px;display:flex;align-items:center'><i class='icon-company' style='margin-right:5px;'></i>{{item.company}}</span>
+                            </div>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <div class='follow-item' v-for='(item, index) in noticerArray' :key='index' @click='goPersonDetail(item)'>
+                            <img class='avatar' :src="item.avatar ? global.avatarPath + item.avatar : default_headPic">
+                            <div class='info'>
+                                <span style='margin:0 0 5px 15px;font-size:14px;font-weight:700;'>{{item.nickname ? item.nickname : item.username}}</span>
+                                <span style='margin:0 0 2px 15px;color:rgb(114, 119, 123);font-size:11px;display:flex;align-items:center'><i class='icon-profession' style='margin-right:5px;'></i>{{item.profession}}</span>
+                                <span style='margin:0 0 2px 15px;color:rgb(114, 119, 123);font-size:11px;display:flex;align-items:center'><i class='icon-company' style='margin-right:5px;'></i>{{item.company}}</span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+        </el-dialog>
     </div>
 </template>
 
 <script>
-import { getPersonInfo, getArticleListByIdAndType, getUserFollowInfo, followPerson } from '../../Api/api.js'
+import { getPersonInfo, getArticleListByIdAndType, getUserFollowInfo, followPerson, unfollowPerson, getFollow, getNoticer } from '../../Api/api.js'
 export default {
     name:'personDetail',
     data(){
@@ -96,7 +127,7 @@ export default {
             default_headPic:require('../../assets/images/default_headPic.jpg'),
             personInfo:'',  // 用户信息对象
             articleList:'', // 用户文章列表对象
-            followList:'', // 用户关注对象
+            followList:'', // 用户关注总对象
             currentType:0,  // 当前文章列表显示类型 （默认 0）
             
             // 按钮配置
@@ -104,6 +135,15 @@ export default {
             showFollowBtn:false,
             showUnfollowBtn:false,
             showOperation:false, // 控制更多按钮是收回 / 展开  当false时点击则展开，当true时点击则为收缩
+
+            Loading:false,
+
+            // 弹窗配置
+            dialogVisible:false,
+            followArray:[], // 关注列表
+            noticerArray:[], // 被关注列表
+            dialogTitle:'', // 标题
+
         }
     },
     mounted(){
@@ -130,6 +170,16 @@ export default {
                 path:'/detail',
                 query:{
                     id:item._id
+                }
+            })
+        },
+        goPersonDetail:function(item){
+            var id = item._id
+            console.log('hhh')
+            this.$router.push({
+                path:'/personDetail',
+                query:{
+                    id: id
                 }
             })
         },
@@ -167,7 +217,7 @@ export default {
         },
         // 获取用户关注信息
         getUserFollow:function(){
-            getUserFollowInfo(this.$route.query.id).then(res => {
+            return getUserFollowInfo(this.$route.query.id).then(res => {
                 console.log('getUserFollowInfo:',res)
                 if(res.data.code == 0){
                     this.followList = res.data.data
@@ -271,18 +321,70 @@ export default {
         },
         // 关注：noticerId-关注人的Id | followId-被关注人的Id
         follow:function(){
-            this.$router.go(0)
             var data = {
                 noticerId: this.currentLoginUserId,
                 followId: this.$route.query.id
             }
+            this.Loading = true
             followPerson(data).then(res => {
-                this.$router.go(0)
+                this.getUserFollow().then(() => {
+                    this.Loading = false
+                })
             })
         },
-        // 取消关注：noticerId-关注人的Id | followId-被关注人的Id 
+        // 取消关注：id-操作人id | followId-被取消关注人的Id 
         unfollow:function(){
-            this.$router.go(0)
+            var data = {
+                id:this.currentLoginUserId,
+                unfollowId:this.$route.query.id
+            }
+            this.Loading = true
+            unfollowPerson(data).then(res => {
+                this.getUserFollow().then(() => {
+                    this.Loading = false
+                })
+            })
+        },
+        showFollowList:function(){
+            this.dialogTitle = 'Follow'
+            getFollow(this.$route.query.id).then( res => {
+                console.log('getFollow:',res)
+                if(res.data.code == 0){
+                    this.followArray = res.data.data
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
+                this.dialogVisible = true
+            })
+        },
+        showNoticerList:function(){
+            this.dialogTitle = 'Noticer'
+            getFollow(this.$route.query.id).then( res => {
+                console.log('getNoticer:',res)
+                if(res.data.code == 0){
+                    this.noticerArray = res.data.data
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
+                this.dialogVisible = true
+            })
+        },
+        // 弹窗关闭回调
+        beforeDialogClose:function(){
+            this.dialogTitle = ''
+            this.followArray = []
+            this.noticerArray = []
+            this.dialogVisible = false
         }
     }
 }
@@ -460,7 +562,7 @@ export default {
                     font-size:12px;
                     list-style:none;
                     padding:10px;
-                    border-bottom:1px solid rgba(230, 126, 34,0);;
+                    border-bottom:1px solid rgba(230, 126, 34,0);
                     cursor:pointer;
                     transition:all .1s linear;
                 }
@@ -597,6 +699,47 @@ export default {
                     }
                 }
             }
+        }
+    }
+
+    .follow-list{
+        display:flex;
+        flex-direction:column;
+        .follow-item{
+            display:flex;
+            padding-bottom:10px;
+            border-bottom:1px solid rgba(178, 186, 194, 0.15);
+            cursor:pointer;
+            transition:all .2s linear;
+            &:hover{
+                border-bottom:1px solid rgba(178, 186, 194, .7);
+            }
+            .avatar{
+                height:60px;
+                width:60px;
+                border-radius:5px;
+            }
+            .info{
+                display:flex;
+                flex-direction:column;
+                justify-content:space-between;
+            }
+        }
+    }
+
+    // 弹窗样式
+    /deep/ .el-dialog{
+        .el-dialog__header{
+            padding:15px 15px 10px 15px;
+        }
+        .el-dialog__title{
+            font-size:16px;
+            font-weight:700;
+            font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            color:rgb(114, 119, 123);
+        }
+        .el-dialog__body{
+            padding:10px 15px;
         }
     }
 }
