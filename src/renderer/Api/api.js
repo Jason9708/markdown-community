@@ -179,6 +179,7 @@ export function getNoticer(id) {
  * @getCommentList 获取某文章评论列表
  *      id 文章id
  * @sendMainComment 为某文章发布主评论
+ * @sendSonComment 为某主评论添加子评论
  */
 
 export function getCommentList(id) {
@@ -201,5 +202,37 @@ export function sendSonComment(id, data) {
         url: `/hdgc/comment/comment/${id}`,
         data: data,
         method: 'post'
+    })
+}
+
+
+/**
+ * about like
+ * @postLike 为某文章添加点赞
+ *      id 文章id
+ * @deleteLike 为某文章取消点赞
+ *      id 文章id
+ */
+
+export function postLike(data) {
+    return Axios({
+        url: '/hdgc/like/',
+        data: data,
+        method: 'post'
+    })
+}
+
+export function deleteLike(data) {
+    return Axios({
+        url: 'hdgc/like/unlike',
+        data: data,
+        method: 'post'
+    })
+}
+
+export function getUserLike(id) {
+    return Axios({
+        url: `hdgc/like/userlike/${id}`,
+        method: 'get'
     })
 }

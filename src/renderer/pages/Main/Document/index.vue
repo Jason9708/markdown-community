@@ -35,8 +35,8 @@
                     <!-- 操作 -->
                     <div class='operation'>
                         <div class='operation-list'>
-                            <i class='icon-like' style='margin-right:10px;cursor:pointer;'></i>
-                            <i class='icon-comment' style='margin-right:10px;cursor:pointer;'></i>
+                            <i class='icon-like' style='margin-right:10px;cursor:pointer;display:flex;align-items:center;' :class="isLike(item) ? 'is-like' : '' " @click.stop='isLike(item) ? cancelLike(item,index) : giveLike(item,index)'><span style='margin-left:5px;font-size:10px;'>{{item.like}}</span></i>
+                            <!-- <i class='icon-comment' style='margin-right:10px;cursor:pointer;'></i> -->
                             <i class='icon-delete' style='cursor:pointer;' @click.stop='deleteArticle(item)'></i>
                         </div>
                         <div class='more' style='cursor:pointer;' @click.stop='tiggerOperationAnime(index)'>
@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { getArticleListById, deletArticleById } from '../../../Api/api.js'
+import { getArticleListById, deletArticleById, postLike, deleteLike, getUserLike } from '../../../Api/api.js'
 import anime from 'animejs'
 export default {
     name:'Document',
@@ -62,11 +62,13 @@ export default {
             next:'right',
             AllartcileList:[], // 文章列表
             articleList:[],  // 当前显示文章列表
+            userlikeArray:[],
             page:1, // 当前页数
         }
     },
     mounted(){
         this.getArticleList()
+        this.getUserLikeData()
     },
     computed:{
         showPrev(){
@@ -80,6 +82,16 @@ export default {
             if(this.page * 4 < this.AllartcileList.length){
                 return true
             }else{
+                return false
+            }
+        },
+        isLike(){
+            return function (item) {
+                for(let i = 0; i < this.userlikeArray.length; i++){
+                    if(this.userlikeArray[i].article == item._id){
+                        return true
+                    }
+                }
                 return false
             }
         }
@@ -213,6 +225,53 @@ export default {
                     id:item._id
                 }
             })
+        },
+        getUserLikeData:function(){
+            var id = JSON.parse(sessionStorage.getItem('currentUserInfo'))._id
+            getUserLike(id).then( res => {
+                console.log('getUserLike:',res)
+                if(res.data.code == 0){
+                    this.userlikeArray = res.data.data
+                }
+            })
+        },
+        giveLike:function(item,index){
+            var data = {
+                id:item._id
+            }
+            postLike(data).then( res => {
+                console.log('postLike:',res)
+                if(res.data.code == 0){
+                    this.articleList[index].like++
+                    this.getUserLikeData()
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
+            })
+        },
+        cancelLike:function(item, index){
+            var data = {
+                id:item._id
+            }
+            deleteLike(data).then( res => {
+                console.log('deleteLike:',res)
+                if(res.data.code == 0){
+                    this.articleList[index].like--
+                    this.getUserLikeData()
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
+            })
         }
     }
 }
@@ -246,6 +305,9 @@ export default {
 .icon-like{
     margin-left:10px;
     transition:all .2s ease;
+}
+.is-like{
+    color:#fc5c65;
 }
 .icon-like:hover {
     color:#fc5c65;
