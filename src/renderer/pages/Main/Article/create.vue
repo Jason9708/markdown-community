@@ -156,23 +156,23 @@ export default {
                 console.log('editorUpload:',res)
                 if(res.data.code == 0){
                     let url = this.global.markdownPicPath + res.data.data
-                    let name = $file.name
-                    if (name.includes('-')) {
-                        name = name.replace(/-/g, '')
-                    }
-                    let content = this.$refs.editor.getContent()
-                    // 第二步.将返回的url替换到文本原位置![...](0) -> ![...](url)  这里是必须要有的
-                    if (content.includes(name)) {
-                        let oStr = `(${pos})`
-                        let nStr = `(${url})`
-                        let index = content.indexOf(oStr)
-                        let str = content.replace(oStr, '')
-                        let insertStr = (soure, start, newStr) => {
-                            return soure.slice(0, start) + newStr + soure.slice(start)
-                        }
-                        this.$refs.editor.mavonEditor.content = insertStr(str, index, nStr)
-                        console.log(this.$refs.editor.mavonEditor.content)
-                    }
+                    this.$refs.editor.$refs.mavonEditor.$img2Url(pos, url);
+                    // let name = $file.name
+                    // if (name.includes('-')) {
+                    //     name = name.replace(/-/g, '')
+                    // }
+                    // let content = this.$refs.editor.getContent()
+                    // // 第二步.将返回的url替换到文本原位置![...](0) -> ![...](url)  这里是必须要有的
+                    // if (content.includes(name)) {
+                    //     let oStr = `(${pos})`
+                    //     let nStr = `(${url})`
+                    //     let index = content.indexOf(oStr)
+                    //     let str = content.replace(oStr, '')
+                    //     let insertStr = (soure, start, newStr) => {
+                    //         return soure.slice(0, start) + newStr + soure.slice(start)
+                    //     }
+                    //     this.$refs.editor.mavonEditor.content = insertStr(str, index, nStr)
+                    // }
                 }
             })
         }

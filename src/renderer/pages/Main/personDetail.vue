@@ -53,8 +53,8 @@
                         <!-- 操作 -->
                         <div class='operation'>
                             <div class='operation-list'>
-                                <i class='icon-like' style='margin-right:10px;cursor:pointer;'></i>
-                                <i class='icon-comment' style='margin-right:10px;cursor:pointer;'></i>
+                                <i class='icon-like' style='margin-right:10px;cursor:pointer;display:flex;align-items:center;' :class="isLike(item) ? 'is-like' : '' " @click.stop='isLike(item) ? cancelLike(item,index) : giveLike(item,index)'><span style='margin-left:5px;font-size:10px;'>{{item.like}}</span></i>
+                                <!-- <i class='icon-comment' style='margin-right:10px;cursor:pointer;'></i> -->
                                 <i class='icon-delete' style='cursor:pointer;' v-if="item.createUserId === currentLoginUserId " @click.stop='deleteArticle(item)'></i>
                             </div>
                             <div class='more' style='cursor:pointer;' @click.stop='tiggerOperationAnime(index)'>
@@ -118,7 +118,7 @@
 </template>
 
 <script>
-import { getPersonInfo, getArticleListByIdAndType, getUserFollowInfo, followPerson, unfollowPerson, getFollow, getNoticer } from '../../Api/api.js'
+import { getPersonInfo, getArticleListByIdAndType, getUserFollowInfo, followPerson, unfollowPerson, getFollow, getNoticer, postLike, deleteLike, getUserLike } from '../../Api/api.js'
 export default {
     name:'personDetail',
     data(){
@@ -128,6 +128,7 @@ export default {
             personInfo:'',  // 用户信息对象
             articleList:'', // 用户文章列表对象
             followList:'', // 用户关注总对象
+            userlikeArray:'', // 用户点赞列表
             currentType:0,  // 当前文章列表显示类型 （默认 0）
             
             // 按钮配置
@@ -146,6 +147,18 @@ export default {
 
         }
     },
+    computed:{
+        isLike(){
+            return function (item) {
+                for(let i = 0; i < this.userlikeArray.length; i++){
+                    if(this.userlikeArray[i].article == item._id){
+                        return true
+                    }
+                }
+                return false
+            }
+        }
+    },
     mounted(){
         if(this.currentLoginUserId === this.$route.query.id){
             this.showUpdateBtn = true
@@ -153,6 +166,7 @@ export default {
         this.getPersonData().then( () => {
             this.getArticleList()
             this.getUserFollow()
+            this.getUserLikeData()
         })
     },
     methods:{
@@ -385,6 +399,56 @@ export default {
             this.followArray = []
             this.noticerArray = []
             this.dialogVisible = false
+        },
+        // 获取用户点赞列表
+        getUserLikeData:function(){
+            var id = JSON.parse(sessionStorage.getItem('currentUserInfo'))._id
+            getUserLike(id).then( res => {
+                console.log('getUserLike:',res)
+                if(res.data.code == 0){
+                    this.userlikeArray = res.data.data
+                }
+            })
+        },
+        // 点赞
+        giveLike:function(item,index){
+            var data = {
+                id:item._id
+            }
+            postLike(data).then( res => {
+                console.log('postLike:',res)
+                if(res.data.code == 0){
+                    this.articleList[index].like++
+                    this.getUserLikeData()
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
+            })
+        },
+        // 取消点赞
+        cancelLike:function(item, index){
+            var data = {
+                id:item._id
+            }
+            deleteLike(data).then( res => {
+                console.log('deleteLike:',res)
+                if(res.data.code == 0){
+                    this.articleList[index].like--
+                    this.getUserLikeData()
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
+            })
         }
     }
 }
@@ -430,6 +494,9 @@ export default {
 .icon-like{
     margin-left:10px;
     transition:all .2s ease;
+}
+.is-like{
+    color:#fc5c65;
 }
 .icon-like:hover {
     color:#fc5c65;

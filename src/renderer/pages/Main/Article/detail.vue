@@ -52,7 +52,7 @@
                             <div class='comment-son-list-item' v-for='(sonItem, index) in item.comments' :key='index'>
                                 <img class='comment-user-avatar' v-if='sonItem.avatar' :src='sonItem.avatar ? global.avatarPath + sonItem.avatar : default_headPic'>
                                 <div class='comment-main'>
-                                    <span style='display:flex;align-items:center;font-size:13px;cursor:pointer' @click='goPersonDetail(item.user)'>{{item.name}}<span style='font-size:10px;margin-left:10px;color:#A4AEA8;'>{{sonItem.date | timeFormat}}</span></span>
+                                    <span style='display:flex;align-items:center;font-size:13px;cursor:pointer' @click='goPersonDetail(sonItem.user)'>{{sonItem.name}}<span style='font-size:10px;margin-left:10px;color:#A4AEA8;'>{{sonItem.date | timeFormat}}</span></span>
                                     <div class='comment-content'><span style='margin-right:5px;color:#A4AEA8;'>@{{sonItem.replyerName}}</span>{{sonItem.text}}</div>
                                 </div>
                                 <div class='btn-group'>

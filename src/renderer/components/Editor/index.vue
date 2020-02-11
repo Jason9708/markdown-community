@@ -5,7 +5,7 @@
 -->
 <template>
     <div class='markdown-container'>
-        <mavon-editor v-model='mavonEditor.content' :boxShadow='mavonEditor.boxShadow' :fontSize='mavonEditor.fontSize' :placeholder='mavonEditor.placeholder' :toolbars='mavonEditor.toolbars' @imgAdd="handleEditorImgAdd"/>
+        <mavon-editor ref='mavonEditor' v-model='mavonEditor.content' :boxShadow='mavonEditor.boxShadow' :fontSize='mavonEditor.fontSize' :placeholder='mavonEditor.placeholder' :toolbars='mavonEditor.toolbars' @imgAdd="handleEditorImgAdd"/>
     </div>
 </template>
 
