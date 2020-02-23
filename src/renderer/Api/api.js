@@ -95,6 +95,13 @@ export function getAllArticleList() {
     })
 }
 
+export function getHotArticleList() {
+    return Axios({
+        url: `/hdgc/article/getHotArticle`,
+        method: 'get'
+    })
+}
+
 export function getArticleListById(id) {
     return Axios({
         url: `/hdgc/article/${id}`,

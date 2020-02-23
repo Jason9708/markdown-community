@@ -77,7 +77,7 @@ const route = new Router({
 
 route.beforeEach((to, from, next) => {
     // 若返回首页以及社区，无须鉴权
-    if (to.path == '/' || to.path == '/society' || to.path == '/personDetail') {
+    if (to.path == '/' || to.path == '/society' || to.path == '/personDetail' || to.path == '/detail') {
         next()
     } else {
         /**

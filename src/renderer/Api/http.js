@@ -10,19 +10,20 @@ import store from '../store'
  * @header 根据不同请求设置
  */
 const Axios = axios.create({
-        baseURL: '/',
-        timeout: 10000,
-        responseType: 'json',
-        withCredentials: true,
-        headers: {
-            'Content-Type': 'application/json;charset=UTF-8'
-        },
-        proxy: {
-            host: 'localhost',
-            port: 5000,
-        }
-    })
-    // 请求拦截
+    baseURL: '/',
+    timeout: 10000,
+    responseType: 'json',
+    withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json;charset=UTF-8'
+    },
+    proxy: {
+        host: 'localhost',
+        port: 5000,
+    }
+})
+
+// 请求拦截
 Axios.interceptors.request.use(config => {
     store.dispatch('setLoading', true)
     if (localStorage.Token) {
@@ -33,7 +34,6 @@ Axios.interceptors.request.use(config => {
 }, error => {
     return Promise.reject(error)
 })
-
 
 // 响应拦截
 Axios.interceptors.response.use(response => {

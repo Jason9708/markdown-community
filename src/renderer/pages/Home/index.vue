@@ -77,11 +77,25 @@
                 </div>
             </div>
         </div>
+        <el-divider content-position="left">Hot Article</el-divider>
         <!-- 热门文章走马灯 -->
         <div class='Home-carousel'>
             <el-carousel :interval="5000" type="card" height="250px">
-                <el-carousel-item v-for="(item,index) in hotArticle" :key="index">
-                    <img :src='item.coverPic' style='height: 100%;width:100%;'>
+                <el-carousel-item v-for="(item,index) in hotArticleList" :key="index">
+                    <div class='carousel-box' @click='goArticleDetail(item)'>
+                        <img :src="item.coverPic ? global.articleCoverPath + item.coverPic : default_cover ">
+                        <div class='carousel-info'>
+                            <span style='margin-bottom:5px;font-size:18px;font-weight:700;display:flex;align-items:center;'>{{item.title}}<span class='classification'>{{getClassificationDes(item.classification)}}</span></span>
+                            <span style='font-size:11px;display:flex;align-items:center;'>
+                                {{item.createUserName}}
+                                <el-divider direction="vertical"></el-divider>
+                                {{item.date | timeFormat}}
+                                <el-divider direction="vertical"></el-divider>
+                                <i class='icon-like'></i>
+                                <span style='margin-left:5px;'>{{item.like}}</span>
+                            </span>
+                        </div>
+                    </div>
                 </el-carousel-item>
             </el-carousel>
         </div>
@@ -96,7 +110,7 @@
 </template>
 
 <script>
-import { userRegister, userLogin, getUserInfo } from '../../Api/api.js'
+import { userRegister, userLogin, getUserInfo, getHotArticleList } from '../../Api/api.js'
 import hotArticle from './mock.js'
 import anime from 'animejs'
 export default {
@@ -104,6 +118,7 @@ export default {
     data(){
         return{
             default_headPic:require('../../assets/images/default_headPic.jpg'),
+            default_cover:require('../../assets/images/default_cover.png'),
             hotArticle:hotArticle,
             keyWord:'', // 搜索值
             loginInfo:{
@@ -115,6 +130,7 @@ export default {
                 password:''
             },
             userInfo:{},
+            hotArticleList:[], // 热门文章列表（点赞数前5位）
             doAnime:'username',
 
             // 显示与隐藏配置
@@ -137,6 +153,7 @@ export default {
                 this.showSearchBox = false
             }
         })
+        this.getHotArticles()
         // 进入首页时若为登录状态，重新获取登录人信息
         if(this.isLogin){
             this.getLoginUserInfo()
@@ -311,6 +328,25 @@ export default {
          openUrl:function(url){
              window.open(url)
          },
+        // 根据classification获取对应分类名  1-随笔   2-新闻   3-知识   4-沸点
+        getClassificationDes:function(classification){
+            switch(classification){
+                case '1':
+                    return '随笔'
+                    break
+                case '2':
+                    return '新闻'
+                    break
+                case '3':
+                    return '知识'
+                    break
+                case '4':
+                    return '沸点'
+                    break
+                default:
+                    return ''
+            }
+        },
         /**
          * 查询登陆人信息
          *  调用时携带 Token ，通过 Token 查询
@@ -327,8 +363,26 @@ export default {
                         message: res.data.message,
                         type: 'error',
                         duration:3000
-                    });
+                    })
                }
+            })
+        },
+        /**
+         * 获取热门文章列表
+         */
+        getHotArticles:function(){
+            getHotArticleList().then( res => {
+                console.log('getHotArticleList:',res)
+                if(res.data.code == 0){
+                    this.hotArticleList = res.data.data
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
             })
         },
         // 跳转人物详情
@@ -338,6 +392,15 @@ export default {
                 path:'/personDetail',
                 query:{
                     id: id
+                }
+            })
+        },
+        // 跳转文章详情页
+        goArticleDetail:function(item){
+            this.$router.push({
+                path:'/detail',
+                query:{
+                    id:item._id
                 }
             })
         }
@@ -415,6 +478,10 @@ export default {
     content: '\e63a';
     font-size:17px;
 }
+.icon-like:before{
+    content: '\e663';
+    font-size:11px;
+}
 
 // css style
 .Home-wrapper{
@@ -437,12 +504,19 @@ export default {
                 flex-direction:column;
                 min-width:400px;
                 margin-bottom:20px;
-                background:linear-gradient(to right top, #ffbe76, #f0932b);
-                color:#fff;
-                box-shadow:0 0 20px -6px #000;
-                border-radius:10px;
+                background:#fff;
+                color:#303952;
+                // box-shadow:0 0 20px -6px #000;
+                border-radius:5px;
+                cursor:pointer;
+                transition:all .2s linear;
+                &:hover {
+                    background:#ecf0f1;
+                }
                 .main{
-                    padding:30px 20px 30px 20px;
+                    padding:30px 10px 20px 10px;
+                    margin:0 20px;
+                    border-bottom:1px solid rgba(178,186,194,.15);
                     display:flex;
                     .avator{
                         width:80px;
@@ -456,7 +530,6 @@ export default {
                         display:flex;
                         flex:1;
                         flex-direction:column;
-                        justify-content:space-between;
                         .name{
                             margin-bottom:15px;
                             font-size:18px;
@@ -464,7 +537,7 @@ export default {
                             letter-spacing:1px;
                         }
                         .intro{
-                            font-size:12px;
+                            font-size:11px;
                             letter-spacing:1px;
                         }
                     }
@@ -472,7 +545,7 @@ export default {
                 .subsidiary{
                     display:flex;
                     flex-direction:column;
-                    font-size:12px;
+                    font-size:11px;
                     padding:10px 20px 20px 50px;
                 }
             }
@@ -635,14 +708,52 @@ export default {
     }
     .Home-carousel{
         padding:30px 0px 20px 0px;
+        .carousel-box{
+            position:relative;
+            height: 100%;
+            width:100%;
+            transition:all .2s linear;
+            &:hover{
+                img{
+                    filter:brightness(90%);
+                }
+            }
+            img{
+                height:100%;
+                width:100%;
+                border-radius:0px;
+            }
+            .carousel-info{
+                display:flex;
+                flex-direction:column;
+                padding:20px 10px;
+                position:absolute;
+                z-index:2; 
+                bottom:0px;
+                left:0px;
+                right:0px;
+                display:flex;
+                flex-direction:column;
+                background:linear-gradient(to top, rgba(116, 125, 140,.2), rgba(116, 125, 140,.4));
+                color:#fff;
+                .classification{
+                    margin-left:10px;
+                    padding:0px 10px;
+                    border-left:2px solid rgba(255, 255, 255,.4);
+                    color:#fff;
+                    font-size:10px;
+                    font-weight:100;
+                }
+            }
+        }
     }
 
-    // element 
-    .el-carousel__item:nth-child(2n) {
-        background-color: #99a9bf;
-    }    
-    .el-carousel__item:nth-child(2n+1) {
-        background-color: #d3dce6;
+    /deep/ .el-divider--horizontal{
+        margin:0px;
+        /deep/ .el-divider__text{
+            background-color:#f4f5f5;
+            font-size:12px;
+        }
     }
 
     // 搜索框
