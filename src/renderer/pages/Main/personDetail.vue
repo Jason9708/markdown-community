@@ -30,38 +30,43 @@
                     </ul>
                 </div>
                 <div class='personDetail-main-left-articleList'>
-                    <div class='article-item' v-for='(item,index) in articleList' :key='index' @click='goArticleDetail(item)'> 
-                        <!-- 标题 -->
-                        <div class='title'>
-                            {{item.title}}
-                            <span class='classification'>
-                            {{getClassificationDes(item.classification)}}
-                            </span>
-                        </div>
-                        <!-- 作者 & 发布时间 -->
-                        <div class='info'>
-                            <span class='name'>{{item.createUserName}}</span>
-                            <span class='time'>{{item.date | timeFormat}}</span>
-                        </div>
-                        <!-- 概要内容 -->
-                        <div class='article'>
-                            <img class='coverPic' v-if='item.coverPic' :src='global.articleCoverPath + item.coverPic'>
-                            <span class='content'>
-                                {{item.intro}}
-                            </span>
-                        </div>
-                        <!-- 操作 -->
-                        <div class='operation'>
-                            <div class='operation-list'>
-                                <i class='icon-like' style='margin-right:10px;cursor:pointer;display:flex;align-items:center;' :class="isLike(item) ? 'is-like' : '' " @click.stop='isLike(item) ? cancelLike(item,index) : giveLike(item,index)'><span style='margin-left:5px;font-size:10px;'>{{item.like}}</span></i>
-                                <!-- <i class='icon-comment' style='margin-right:10px;cursor:pointer;'></i> -->
-                                <i class='icon-delete' style='cursor:pointer;' v-if="item.createUserId === currentLoginUserId " @click.stop='deleteArticle(item)'></i>
+                    <template v-if='articleList.length === 0'>
+                        <img style='width:150px; height:150px;margin-top:20px;' class='coverPic' :src='no_content'>
+                    </template>
+                    <template v-else>
+                        <div class='article-item' v-for='(item,index) in articleList' :key='index' @click='goArticleDetail(item)'> 
+                            <!-- 标题 -->
+                            <div class='title'>
+                                {{item.title}}
+                                <span class='classification'>
+                                    {{getClassificationDes(item.classification)}}
+                                </span>
                             </div>
-                            <div class='more' style='cursor:pointer;' @click.stop='tiggerOperationAnime(index)'>
-                                <i class='icon-more'></i>
+                            <!-- 作者 & 发布时间 -->
+                            <div class='info'>
+                                <span class='name'>{{item.createUserName}}</span>
+                                <span class='time'>{{item.date | timeFormat}}</span>
+                            </div>
+                            <!-- 概要内容 -->
+                            <div class='article'>
+                                <img class='coverPic' v-if='item.coverPic' :src='global.articleCoverPath + item.coverPic'>
+                                <span class='content'>
+                                    {{item.intro}}
+                                </span>
+                            </div>
+                            <!-- 操作 -->
+                            <div class='operation'>
+                                <div class='operation-list'>
+                                    <i class='icon-like' style='margin-right:10px;cursor:pointer;display:flex;align-items:center;' :class="isLike(item) ? 'is-like' : '' " @click.stop='isLike(item) ? cancelLike(item,index) : giveLike(item,index)'><span style='margin-left:5px;font-size:10px;'>{{item.like}}</span></i>
+                                    <!-- <i class='icon-comment' style='margin-right:10px;cursor:pointer;'></i> -->
+                                    <i class='icon-delete' style='cursor:pointer;' v-if="item.createUserId === currentLoginUserId " @click.stop='deleteArticle(item)'></i>
+                                </div>
+                                <div class='more' style='cursor:pointer;' @click.stop='tiggerOperationAnime(index)'>
+                                    <i class='icon-more'></i>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </template>
                 </div>
             </div>
             <div class='personDetail-main-right'>
@@ -123,8 +128,9 @@ export default {
     name:'personDetail',
     data(){
         return{
-            currentLoginUserId:JSON.parse(sessionStorage.getItem('currentUserInfo'))._id,
+            currentLoginUserId:sessionStorage.getItem('currentUserInfo') ? JSON.parse(sessionStorage.getItem('currentUserInfo'))._id : '',
             default_headPic:require('../../assets/images/default_headPic.jpg'),
+            no_content:require('../../assets/images/no_content.jpg'),
             personInfo:'',  // 用户信息对象
             articleList:'', // 用户文章列表对象
             followList:'', // 用户关注总对象
@@ -166,7 +172,9 @@ export default {
         this.getPersonData().then( () => {
             this.getArticleList()
             this.getUserFollow()
-            this.getUserLikeData()
+            if(sessionStorage.getItem('currentUserInfo')){
+                this.getUserLikeData()
+            }
         })
     },
     methods:{
@@ -335,6 +343,16 @@ export default {
         },
         // 关注：noticerId-关注人的Id | followId-被关注人的Id
         follow:function(){
+            if(!sessionStorage.getItem('currentUserInfo')){
+                this.$notify({
+                    title: 'Tips',
+                    message: '请先登录！',
+                    type: 'error',
+                    duration:3000
+                })
+                return
+            }
+
             var data = {
                 noticerId: this.currentLoginUserId,
                 followId: this.$route.query.id
@@ -348,6 +366,16 @@ export default {
         },
         // 取消关注：id-操作人id | followId-被取消关注人的Id 
         unfollow:function(){
+            if(!sessionStorage.getItem('currentUserInfo')){
+                this.$notify({
+                    title: 'Tips',
+                    message: '请先登录！',
+                    type: 'error',
+                    duration:3000
+                })
+                return
+            }
+
             var data = {
                 id:this.currentLoginUserId,
                 unfollowId:this.$route.query.id
@@ -524,11 +552,11 @@ export default {
 
 .personDetail-wrapper {
     position:relative;
-    height:100%;
     background:#f4f5f5;
     display:flex;
     flex-direction:column;
     align-items:center;
+    min-height:100%;
     overflow:auto;
     font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
     .btn-return{
@@ -726,7 +754,7 @@ export default {
                         }
                         .show-Operationlist{
                             opacity:1;
-                            width:90px;
+                            width:70px;
                             transform:scale(1,1);
                         }
                     }

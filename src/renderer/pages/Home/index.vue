@@ -111,7 +111,6 @@
 
 <script>
 import { userRegister, userLogin, getUserInfo, getHotArticleList } from '../../Api/api.js'
-import hotArticle from './mock.js'
 import anime from 'animejs'
 export default {
     name:'Home',
@@ -119,7 +118,6 @@ export default {
         return{
             default_headPic:require('../../assets/images/default_headPic.jpg'),
             default_cover:require('../../assets/images/default_cover.png'),
-            hotArticle:hotArticle,
             keyWord:'', // 搜索值
             loginInfo:{
                 username:'',

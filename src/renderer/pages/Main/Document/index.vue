@@ -10,7 +10,6 @@
                 <i class='icon-right'></i>
             </div>
             <!-- 文章列表 -->
-            <!-- 文章列表 -->
             <div class='article-list'>
                 <div class='article-item' v-for='(item,index) in articleList' :key='index' @click='goArticleDetail(item)'> 
                     <!-- 标题 -->

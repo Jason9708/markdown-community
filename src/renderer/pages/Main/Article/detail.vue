@@ -29,7 +29,7 @@
             <div class='article-comment'>
                 <div class='comment-input-container'>
                     <div class='top'>
-                        <img class='comment-user-avatar' v-if='artcileData.createUserAvatar' :src='artcileData.createUserAvatar ? global.avatarPath + artcileData.createUserAvatar : default_headPic'>
+                        <img class='comment-user-avatar' :src='currentLoginUser.avatar ? global.avatarPath + currentLoginUser.avatar : default_headPic'>
                         <textarea class='comment-input' v-model='commentText' placeholder='输入评论...' maxlength="100" @focus='textAreaFocus' @blur='textAreaBlur'></textarea>
                     </div>
                     <div class='bottom' v-if='showCommentBtn'>
@@ -85,6 +85,7 @@ export default {
     data(){
         return{
             default_headPic:require('../../../assets/images/default_headPic.jpg'),
+            currentLoginUser:sessionStorage.getItem('currentUserInfo') ? JSON.parse(sessionStorage.getItem('currentUserInfo')) : '',
             artcileData:'',
 
             // 评论配置
@@ -188,6 +189,15 @@ export default {
         },
         // 发布评论
         postMainComment:function(){
+            if(!sessionStorage.getItem('currentUserInfo')){
+                this.$notify({
+                    title: 'Tips',
+                    message: '评论请先登录！',
+                    type: 'error',
+                    duration:3000
+                })
+                return
+            }
             var data = {
                 id: this.$route.query.id,
                 text: this.commentText
@@ -207,6 +217,16 @@ export default {
             })
         },
         openCommentDialog:function(item,sonItem){
+            if(!sessionStorage.getItem('currentUserInfo')){
+                this.$notify({
+                    title: 'Tips',
+                    message: '评论请先登录！',
+                    type: 'error',
+                    duration:3000
+                })
+                return
+            }
+            
             this.currentMainCommentItem = item
             if(sonItem){
                 this.currentSonCommentItem = sonItem

@@ -101,6 +101,8 @@ route.beforeEach((to, from, next) => {
                     type: 'error',
                     duration: 3000
                 })
+                sessionStorage.clear()
+                localStorage.clear()
                 store.dispatch('clearCurrentState')
                 next('/')
             } else {

@@ -26,6 +26,11 @@ Vue.filter('timeFormat', function(date) {
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.config.productionTip = false
 
+window.onbeforeunload = function(e) {
+    sessionStorage.clear()
+    localStorage.clear()
+};
+
 /* eslint-disable no-new */
 new Vue({
     components: { App },

@@ -1,6 +1,6 @@
 <template>
     <div class='society-wrapper'>
-        <div class='nav-list'>
+        <!-- <div class='nav-list'>
             <div class='nav-item' style='margin-right:20px;' @click='ALL'>
                 <span>ALL</span>
             </div>
@@ -8,7 +8,7 @@
                 <span>HOT</span>
             </div>
             <div class='isActive'></div>
-        </div>
+        </div> -->
         <div class='main-container'>
             <!--上一页-->
             <div class='PREV' @click='Prev' v-if='showPrev'>
@@ -45,7 +45,7 @@
                         <div class='operation-list'>
                             <i class='icon-like' style='margin-right:10px;cursor:pointer;display:flex;align-items:center;' :class="isLike(item) ? 'is-like' : '' " @click.stop='isLike(item) ? cancelLike(item,index) : giveLike(item,index)'><span style='margin-left:5px;font-size:10px;'>{{item.like}}</span></i>
                             <!-- <i class='icon-comment' style='margin-right:10px;cursor:pointer;'></i> -->
-                            <i class='icon-delete' style='cursor:pointer;' @click.stop='deleteArticle(item)'></i>
+                            <i class='icon-delete' style='cursor:pointer;' v-if='currentLoginUserId === item.createUserId' @click.stop='deleteArticle(item)'></i>
                         </div>
                         <div class='more' style='cursor:pointer;' @click.stop='tiggerOperationAnime(index)'>
                             <i class='icon-more'></i>
@@ -64,6 +64,7 @@ export default {
     name:'Society',
     data(){
         return{
+            currentLoginUserId:sessionStorage.getItem('currentUserInfo') ? JSON.parse(sessionStorage.getItem('currentUserInfo'))._id : '',
             showOperation:false, // 控制更多按钮是收回 / 展开  当false时点击则展开，当true时点击则为收缩
             // 上下页 按钮配置
             prev:'left',
@@ -103,7 +104,9 @@ export default {
     },
     mounted(){
         this.getArticleList()
-        this.getUserLikeData()
+        if(sessionStorage.getItem('currentUserInfo')){
+            this.getUserLikeData()
+        }
     },
     methods:{
         /**
@@ -457,6 +460,9 @@ export default {
             display: flex;
             flex-direction: column;
             align-items: center;
+            &:first-child{
+                margin-top:30px;
+            }
             .article-item{
                 position: relative;
                 display: flex;
