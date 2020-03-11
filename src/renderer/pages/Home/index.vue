@@ -3,7 +3,13 @@
         <div class='Home-container'>
             <div class='container-right'>
                 <!-- 右侧个人信息展示栏 -->
-                <div class='information-box' v-if='isLogin' @click.stop='goPersonDetail'>
+                <div class='information-box' v-if='isLogin' @click.stop='goPersonDetail' @contextmenu.prevent='rightClickEvent'>
+                    <!-- 鼠标右击 -->
+                    <div class='logout-box'>
+                        <ul>
+                            <li @click.stop='logoutEvent'>退出</li>
+                        </ul>
+                    </div>
                     <!-- 搜索按钮 -->
                     <i class='icon-search' style='position:absolute;top:5px;right:5px;cursor:pointer;' @click.stop='showSearchBox = true'></i>
                     <!-- 个人主要信息：头像、昵称、签名 -->
@@ -103,14 +109,36 @@
         <transition name='fade'>
             <div class='search-box' v-if='showSearchBox'>
                 <i class='icon-search' style='font-size:12px;padding:3px;border:1px solid #EC6F66;border-radius:50%;background:#EC6F66;'></i>
-                <input type="text" class="search" v-model='keyWord' />
+                <input type="text" class="search" v-model='keyWord' @keyup.enter="search"/>
+            </div>
+        </transition>
+        <transition name='searchData-fade'>
+            <div class='searchData-box' v-if='showSearchData'>
+                <i class='icon-close' style='position:absolute;top:10px;right:10px;font-size:11px;' @click='closeSearchData'></i>
+                <!-- 用户 -->
+                <div class='searchData-user-box'>
+                    <div class='user-item' v-for='(item, index) in searchUserList' :key='index'>
+                        <img class='avator' :src="userInfo.avatar ? global.avatarPath + item.avatar : default_headPic"></img>
+                        <span style='margin-top:10px;'>{{item.nickname}}</span>
+                    </div>
+                </div>
+                <!-- 文章 -->
+                <div class='searchData-article-box'>
+                    <div class='article-item' v-for='(item, index) in searchArticleList' :key='index'>
+                        <img class='coverPic' :src="item.coverPic ? global.articleCoverPath + item.coverPic : default_cover"></img>
+                        <div class='article-info'>
+                            <span style='font-size:14px;margin-bottom:10px;'>{{item.title}}</span>
+                            <span style='font-size:11px;'>{{item.createUserName}}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </transition>
     </div>
 </template>
 
 <script>
-import { userRegister, userLogin, getUserInfo, getHotArticleList } from '../../Api/api.js'
+import { userRegister, userLogin, getUserInfo, getHotArticleList, searchData } from '../../Api/api.js'
 import anime from 'animejs'
 export default {
     name:'Home',
@@ -119,6 +147,8 @@ export default {
             default_headPic:require('../../assets/images/default_headPic.jpg'),
             default_cover:require('../../assets/images/default_cover.png'),
             keyWord:'', // 搜索值
+            searchUserList:[], // 搜索所得用户列表
+            searchArticleList:[], // 搜索所得文章列表
             loginInfo:{
                 username:'',
                 password:''
@@ -133,6 +163,7 @@ export default {
 
             // 显示与隐藏配置
             showSearchBox:false,
+            showSearchData:false,
             showRegister:false,
 
             // 控制按钮加载
@@ -149,6 +180,11 @@ export default {
             let className = e.target.className
             if(className != 'search-box' && className != 'search' && className != 'icon-search'){
                 this.showSearchBox = false
+            }
+            if(className != 'logout-box'){
+                if(document.querySelector('.logout-box') && document.querySelector('.logout-box').style.display == 'block'){
+                    document.querySelector('.logout-box').style.display = 'none'
+                }
             }
         })
         this.getHotArticles()
@@ -401,6 +437,49 @@ export default {
                     id:item._id
                 }
             })
+        },
+        rightClickEvent(event){
+            var ele = document.querySelector('.logout-box')
+            ele.style.top = event.layerY + 5 + 'px'
+            ele.style.left = event.layerX + 5 + 'px'
+            ele.style.display = 'block'
+        },
+        logoutEvent:function(){
+            this.$router.go(0)
+        },
+        search:function(){
+            if(this.keyWord == ''){
+                this.$notify({
+                    title: 'Tips',
+                    message: '搜索内容不能为空！',
+                    type: 'error',
+                    duration:3000
+                })
+                return
+            }
+            var data = {
+                searchText:this.keyWord
+            }
+            searchData(data).then( res => {
+                if(res.data.code == 0){
+                    this.searchUserList = res.data.data.users
+                    this.searchArticleList = res.data.data.articles
+                    this.showSearchData = true
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
+            })
+        },
+        closeSearchData:function(){
+            this.showSearchData = false
+            this.searchUserList = []
+            this.searchArticleList = []
+            this.keyWord = ''
         }
     }
 }
@@ -480,6 +559,18 @@ export default {
     content: '\e663';
     font-size:11px;
 }
+.icon-close:before{
+    content:'\e608';
+    font-size:10px;
+}
+.icon-close{
+    cursor:pointer;
+    color:#fff;
+    transition:all .2s ease;
+}
+.icon-close:hover {
+    color:rgba(87, 101, 116,1.0);
+}
 
 // css style
 .Home-wrapper{
@@ -510,6 +601,46 @@ export default {
                 transition:all .2s linear;
                 &:hover {
                     background:#ecf0f1;
+                }
+                .logout-box{
+                    display:none;
+                    position:absolute;
+                    border-radius:3px;
+                    background:rgba(45, 52, 54,1);
+                    color:#fff;
+                    font-size:12px;
+                    animation: logout .2s ease;
+                    -moz-animation: logout .2s ease;
+                    -webkit-animation: logout .2s ease;
+                    -o-animation: logout .2s ease;
+                    &:before{
+                        content:'';
+                        height:0px;
+                        width:0px;
+                        border-top:5px solid transparent;
+                        border-left:5px solid transparent;
+                        border-right:5px solid transparent;
+                        border-bottom:5px solid rgba(45, 52, 54,1);
+                        position:absolute;
+                        top:-9px;
+                        left:5px;
+                    }
+                    ul{
+                        display:flex;
+                        padding:0;
+                        margin:0;
+                        list-style:none;
+                        li{
+                            list-style:none;
+                            padding:5px 15px;
+                            display:flex;
+                            justify-content:center;
+                            transition:all .2s linear;
+                            &:hover{
+                                color:rgba(178, 190, 195,1.0);
+                            }
+                        }
+                    }
                 }
                 .main{
                     padding:30px 10px 20px 10px;
@@ -781,6 +912,59 @@ export default {
             outline:none;
         }
     }
+
+    // 搜索内容
+    .searchData-box{
+        position: absolute;
+        top:80px;
+        left:50%;
+        transform:translateX(-50%);
+        width:400px;
+        display:flex;
+        flex-direction:column;
+        padding:10px;
+        border-radius:5px;
+        background:rgba(61, 61, 61,.9);
+        color:#fff;
+        .searchData-user-box{
+            display:flex;
+            flex-wrap:nowrap;
+            oveflow:auto;
+            border-bottom:2px solid rgba(255, 168, 1,.7);
+            .user-item{
+                display:flex;
+                flex-direction:column;
+                align-items:center;
+                padding:10px;
+                font-size:11px;
+                .avator{
+                    width:50px;
+                    height:50px;
+                    border-radius:5px;
+                }
+            }
+        }
+        .searchData-article-box{
+            margin-top:10px;
+            display:flex;
+            flex-direction:column;
+            .article-item{
+                display:flex;
+                padding:10px;
+                .coverPic{
+                    width:100px;
+                    height:60px;
+                    border-radius:5px;
+                }
+                .article-info{
+                    display:flex;
+                    flex-direction:column;
+                    margin-left:10px;
+                }
+            }
+        }
+    }
+
     // 进去/离开动画
     .fade-enter-active, .fade-leave-active {
         transition: all .5s;
@@ -788,6 +972,34 @@ export default {
     .fade-enter, .fade-leave-active {
         top: -50px;
         opacity:0;
+    }
+
+}
+
+
+// 关键帧动画
+@mixin keyframes($animationName) {
+    @-webkit-keyframes #{$animationName} {
+        @content;
+    }
+    @-moz-keyframes #{$animationName} {
+        @content;
+    }
+    @-o-keyframes #{$animationName} {
+        @content;
+    }
+    @keyframes #{$animationName} {
+        @content;
+    }
+}
+@include keyframes(logout) {
+    0%   { 
+        transform:scaleX(0.5);
+        transform:scaleY(0.5);
+    }
+    100% { 
+        transform:scaleX(1);
+        transform:scaleY(1);
     }
 }
 

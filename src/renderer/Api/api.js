@@ -243,3 +243,16 @@ export function getUserLike(id) {
         method: 'get'
     })
 }
+
+/**
+ * about search
+ * @searchData
+ *      关键字搜索用户 / 文章
+ */
+export function searchData(data) {
+    return Axios({
+        url: '/hdgc/search/',
+        data: data,
+        method: 'post'
+    })
+}
