@@ -138,9 +138,11 @@ export default {
             if(this.noTigger){
                 this.tiggerAnime()
                 this.noTigger = false
+                this.$eventBus.$emit('slideStatus', false)
             }else{
                 this.restoreAnime()
                 this.noTigger = true
+                this.$eventBus.$emit('slideStatus', true)
             }
         },
         // 侧边栏跳转

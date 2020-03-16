@@ -3,7 +3,7 @@
         <div class='Home-container'>
             <div class='container-right'>
                 <!-- 右侧个人信息展示栏 -->
-                <div class='information-box' v-if='isLogin' @click.stop='goPersonDetail' @contextmenu.prevent='rightClickEvent'>
+                <div class='information-box' v-if='isLogin' @click.stop='goPersonDetail(userInfo._id)' @contextmenu.prevent='rightClickEvent'>
                     <!-- 鼠标右击 -->
                     <div class='logout-box'>
                         <ul>
@@ -116,15 +116,15 @@
             <div class='searchData-box' v-if='showSearchData'>
                 <i class='icon-close' style='position:absolute;top:10px;right:10px;font-size:11px;' @click='closeSearchData'></i>
                 <!-- 用户 -->
-                <div class='searchData-user-box'>
-                    <div class='user-item' v-for='(item, index) in searchUserList' :key='index'>
+                <div class='searchData-user-box' v-if='searchUserList.length > 0' >
+                    <div class='user-item' v-for='(item, index) in searchUserList' :key='index' @click='goPersonDetail(item._id)'>
                         <img class='avator' :src="userInfo.avatar ? global.avatarPath + item.avatar : default_headPic"></img>
                         <span style='margin-top:10px;'>{{item.nickname}}</span>
                     </div>
                 </div>
                 <!-- 文章 -->
-                <div class='searchData-article-box'>
-                    <div class='article-item' v-for='(item, index) in searchArticleList' :key='index'>
+                <div class='searchData-article-box' v-if='searchArticleList.length > 0'>
+                    <div class='article-item' v-for='(item, index) in searchArticleList' :key='index' @click='goArticleDetail(item)'>
                         <img class='coverPic' :src="item.coverPic ? global.articleCoverPath + item.coverPic : default_cover"></img>
                         <div class='article-info'>
                             <span style='font-size:14px;margin-bottom:10px;'>{{item.title}}</span>
@@ -298,7 +298,6 @@ export default {
          * Click 
          * @signinClcik - 登录点击事件
          * @registerClick - 注册点击事件
-         * @openUrl - 链接跳转
          */
          signinClcik:function(){
             // this.loadingAnime() - 禁用
@@ -359,8 +358,9 @@ export default {
             this.registerInfo.username = ''
             this.registerInfo.password = ''
          },
+         // 链接跳转
          openUrl:function(url){
-             window.open(url)
+             this.$electron.shell.openExternal(url);
          },
         // 根据classification获取对应分类名  1-随笔   2-新闻   3-知识   4-沸点
         getClassificationDes:function(classification){
@@ -419,9 +419,8 @@ export default {
                 }
             })
         },
-        // 跳转人物详情
-        goPersonDetail(){
-            var id = JSON.parse(sessionStorage.getItem('currentUserInfo'))._id
+        // 跳转个人详情
+        goPersonDetail(id){
             this.$router.push({
                 path:'/personDetail',
                 query:{
@@ -445,6 +444,7 @@ export default {
             ele.style.display = 'block'
         },
         logoutEvent:function(){
+            console.log('hhh')
             this.$router.go(0)
         },
         search:function(){

@@ -524,8 +524,8 @@ export default {
                         font-size:13px;
                         line-height: 25px;
                         color:#303231;
-                        overflow: hidden;
-                        text-overflow:ellipsis;
+                        overflow : hidden;
+                        text-overflow: ellipsis;
                     }
                 }
                 .operation{

@@ -74,7 +74,22 @@ export default {
         Header,
         Editor
     },
+    mounted(){
+        // 监听 slideStatus 事件
+        this.$eventBus.$on('slideStatus', data => {
+            this.changeEditorWidth(data)
+        })
+    },
     methods:{
+        // 修改编辑器宽度
+        changeEditorWidth(data){
+            var editor = document.getElementsByClassName('editor')[0]
+            if(data){
+                editor.style.width = 600 + 'px'
+            }else{
+                editor.style.width = 800 + 'px'
+            }
+        },
         // 点击发布（ 弹出弹窗）
         beforeSubmit:function(){
             this.submitDialog = true

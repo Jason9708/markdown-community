@@ -14,6 +14,8 @@ Vue.use(mavonEditor)
 // 挂载全局变量
 Vue.prototype.global = global
 
+Vue.prototype.$eventBus = new Vue();
+
 // 全局过滤器
 Vue.filter('timeFormat', function(date) {
     var time = new Date(date)
