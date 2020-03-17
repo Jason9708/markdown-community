@@ -64,10 +64,20 @@ export default {
             const isLt2M = file.size / 1024 / 1024 < 2;
 
             if (!isPic) {
-                this.$message.error('上传头像图片只能是 JPG 或 PNG 格式!');
+                this.$notify({
+                    title: 'Tips',
+                    message: '上传头像图片只能是 JPG 或 PNG 格式!',
+                    type: 'error',
+                    duration:3000
+                })
             }
             if (!isLt2M) {
-                this.$message.error('上传头像图片大小不能超过 2MB!');
+                this.$notify({
+                    title: 'Tips',
+                    message: '上传头像图片大小不能超过 2MB!',
+                    type: 'error',
+                    duration:3000
+                })
             }
             return isPic && isLt2M;  // false 时停止上传
         }

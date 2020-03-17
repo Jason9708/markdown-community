@@ -21,9 +21,9 @@
                     <i class='icon-write'></i>
                     <span style='margin-top:10px;'>Edtior</span>
                 </div>
-                <div class='btn' :class="$route.path === '/document'? 'active' : ''" @click="transLink('Document')">
+                <div class='btn' :class="$route.path === '/document'? 'active' : ''" @click="transLink('Dynamic')">
                     <i class='icon-template'></i>
-                    <span style='margin-top:10px;'>Document</span>
+                    <span style='margin-top:10px;'>Dynamic</span>
                 </div>
                 <div class='btn' :class="$route.path === '/profile'? 'active' : ''" @click="transLink('Profile')">
                     <i class='icon-setting'></i>
@@ -156,7 +156,7 @@ export default {
                     routeName = '/create'
                     break
                 case 'Document':
-                    routeName = '/document'
+                    routeName = '/dynamic'
                     break
                 case 'Profile':
                     routeName = '/profile'

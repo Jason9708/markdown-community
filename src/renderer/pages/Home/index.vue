@@ -74,7 +74,7 @@
                     </div>
                     <div class='btn' @click="transLink('Document')">
                         <i class='icon-template'></i>
-                        <span style='margin-top:10px;'>Document</span>
+                        <span style='margin-top:10px;'>Dynamic</span>
                     </div>
                     <div class='btn' @click="transLink('Profile')">
                         <i class='icon-setting'></i>
@@ -208,7 +208,7 @@ export default {
                     routeName = '/create'
                     break
                 case 'Document':
-                    routeName = '/document'
+                    routeName = '/dynamic'
                     break   
                 case 'Profile':
                     routeName = '/profile'

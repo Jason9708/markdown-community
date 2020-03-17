@@ -55,6 +55,14 @@ const route = new Router({
                     component: require('@/pages/Main/Document/index.vue').default,
                 },
                 {
+                    path: '/dynamic',
+                    name: 'dynamic',
+                    meta: {
+                        title: '动态圈'
+                    },
+                    component: require('@/pages/Main/Document/dynamic.vue').default,
+                },
+                {
                     path: '/profile',
                     name: 'profile',
                     meta: {
@@ -77,7 +85,7 @@ const route = new Router({
 
 route.beforeEach((to, from, next) => {
     // 若返回首页以及社区，无须鉴权
-    if (to.path == '/' || to.path == '/society' || to.path == '/personDetail' || to.path == '/detail') {
+    if (to.path == '/' || to.path == '/society' || to.path == '/personDetail' || to.path == '/detail' || to.path == '/dynamic') {
         next()
     } else {
         /**
