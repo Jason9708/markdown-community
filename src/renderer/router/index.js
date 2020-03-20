@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import store from '../store';
 import jwt_decode from 'jwt-decode'
-import { Message } from 'element-ui'
 Vue.use(Router)
 
 const route = new Router({

@@ -256,3 +256,22 @@ export function searchData(data) {
         method: 'post'
     })
 }
+
+/**
+ * about dynamic
+ * @postDynamic 用户发布动态
+ * @getDynamic 获取所有动态
+ */
+export function postDynamic(data) {
+    return Axios({
+        url: '/hdgc/dynamic',
+        data: data,
+        method: 'post'
+    })
+}
+export function getDynamic() {
+    return Axios({
+        url: '/hdgc/dynamic',
+        method: 'get'
+    })
+}

@@ -155,7 +155,7 @@ export default {
                 case 'Main':
                     routeName = '/create'
                     break
-                case 'Document':
+                case 'Dynamic':
                     routeName = '/dynamic'
                     break
                 case 'Profile':
