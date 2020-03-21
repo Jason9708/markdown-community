@@ -261,6 +261,7 @@ export function searchData(data) {
  * about dynamic
  * @postDynamic 用户发布动态
  * @getDynamic 获取所有动态
+ * @deleteDynamic 删除动态
  */
 export function postDynamic(data) {
     return Axios({
@@ -273,5 +274,11 @@ export function getDynamic() {
     return Axios({
         url: '/hdgc/dynamic',
         method: 'get'
+    })
+}
+export function deleteDynamic(id) {
+    return Axios({
+        url: `/hdgc/dynamic/${id}`,
+        method: 'delete'
     })
 }

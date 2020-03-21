@@ -30,43 +30,53 @@
             <div class='dynamic-box'>
                 <div class='dynamic-list'>
                     <div class='dynamic-item' v-for='(item,index) in dynamicList' :key='index'>
-                        <div class='left'>
-                            <img class='info-userAvatar' v-if='item.createUserAvatar' :src='item.createUserAvatar ? global.avatarPath + item.createUserAvatar : default_headPic' @click='goPersonDetail(item.createUserId)'>
-                            <!-- 用户姓名 公司 职业 -->
-                            <div class='info-user-container'>
-                                <span class='info-user-name'>{{item.createUserName}}</span>
-                                <span class='info-user-backdrop'>
-                                    <span style='width:60px;overflow:hidden;text-overflow:ellipsis;white-space: nowrap;'><i class='icon-profession' style='margin-right:5px;'></i>{{item.createUserProfession}}</span>
-                                    <span style='width:60px;overflow:hidden;text-overflow:ellipsis;white-space: nowrap;'><i class='icon-company' style='margin-right:5px;'></i>{{item.createUserCompany}}</span>
-                                </span>
+                        <div style='display:flex;'>
+                            <div class='left'>
+                                <img class='info-userAvatar' v-if='item.createUserAvatar' :src='item.createUserAvatar ? global.avatarPath + item.createUserAvatar : default_headPic' @click='goPersonDetail(item.createUserId)'>
+                                <!-- 用户姓名 公司 职业 -->
+                                <div class='info-user-container'>
+                                    <span class='info-user-name'>{{item.createUserName}}</span>
+                                    <!-- <span class='info-user-backdrop'>
+                                        <span style='width:60px;overflow:hidden;text-overflow:ellipsis;white-space: nowrap;'><i class='icon-profession' style='margin-right:5px;'></i>{{item.createUserProfession}}</span>
+                                        <span style='width:60px;overflow:hidden;text-overflow:ellipsis;white-space: nowrap;'><i class='icon-company' style='margin-right:5px;'></i>{{item.createUserCompany}}</span>
+                                    </span> -->
+                                </div>
+                            </div>
+                            <div class='right'>
+                                <div class='dynamic-content'>
+                                    {{item.content}}
+                                </div>
+                                <div class='dynamic-img' v-if='item.images.length != 0'>
+                                    <img class='info-img' v-for='(img,index) in item.images' :key='index' :src='global.dynamicPicPath + img'>
+                                </div>
                             </div>
                         </div>
-                        <div class='right'>
-                            <div class='dynamic-content'>
-                                {{item.content}}
-                            </div>
-                            <div class='dynamic-img' v-if='item.images.length != 0'>
-                                <img class='info-img' v-for='(img,index) in item.images' :key='index' :src='global.dynamicPicPath + img'>
-                            </div>
+                        <div class='bottom'>
+                            <div class='bottom-btn' style='border-right:2px solid rgba(61, 61, 61,.5);'><i class='icon-like' style='margin-right:5px;'></i></div>
+                            <div class='bottom-btn'><i class='icon-comment' style='margin-right:5px;'></i></div>
+                            <div class='bottom-btn' v-if='item.createUserId == currentLoginUserId' style='border-left:2px solid rgba(61, 61, 61,.5);'><i class='icon-delete' style='margin-right:5px;' @click='deleteDynamicById(item)'></i></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- 发布动态 -->
+        <transition name='toTop-fade'>
+            <div class='dynamic-toTop' v-show='showToTop' @click='goToTop'>
+                <i class='icon-top'></i>
+            </div>
+        </transition>   
     </div>
 </template>
 
 <script>
 import uploadImg from '../../../components/Uploadimg'
-import { postDynamic, getDynamic } from '../../../Api/api.js'
+import { postDynamic, getDynamic, deleteDynamic } from '../../../Api/api.js'
 export default {
     name:'Dynamic',
     data(){
         return{
             default_headPic:require('../../../assets/images/default_headPic.jpg'),
             currentLoginUserId:sessionStorage.getItem('currentUserInfo') ? JSON.parse(sessionStorage.getItem('currentUserInfo'))._id : '',
-            content:'',
             // 头像上传配置
             uploadUrl:'', // 上传地址
             acceptType:'.jpg,.jpeg,.png',
@@ -76,6 +86,10 @@ export default {
             imgList:[],
 
             dynamicList:[],
+            content:'',
+
+            // 显示回顶按钮
+            showToTop:false
         }
     },
     components:{
@@ -83,6 +97,15 @@ export default {
     },
     mounted(){
         this.getDynamicList()
+        var ele = document.getElementsByClassName('dynamic-wrapper')[0]
+        var self = this
+        ele.addEventListener("scroll", function (e) {
+            if(e.target.scrollTop > 0){
+                self.showToTop = true
+            }else{
+                self.showToTop = false
+            }
+        })
     },
     methods:{
         handleChanged(file, fileList){
@@ -98,6 +121,11 @@ export default {
                 type: 'error',
                 duration:3000
             })
+        },
+        // 回到顶部
+        goToTop(){
+            var ele = document.getElementsByClassName('dynamic-wrapper')[0]
+            ele.scrollTop = 0
         },
         // 获取动态
         getDynamicList(){
@@ -137,6 +165,33 @@ export default {
 
             postDynamic(data).then(res => {
                 console.log('发布动态：', res)
+                if(res.data.code == 0){
+                    this.getDynamicList()
+                    this.imgList = []
+                    this.content = ''
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
+            })
+        },
+        deleteDynamicById(item){
+            deleteDynamic(item._id).then(res => {
+                console.log('删除动态：',res)
+                if(res.data.code == 0){
+                    this.getDynamicList()
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
             })
         }
     }
@@ -154,12 +209,29 @@ export default {
     content: '\e72a';
     font-size:14px;
 }
+.icon-comment:before {
+    content: '\e600';
+    font-size:14px;
+}
+.icon-like:before {
+    content: '\e61e';
+    font-size:14px;
+}
+.icon-delete:before{
+    content: '\e645';
+    font-size:14px;
+}
+.icon-top:before{
+    content: '\e63c';
+    font-size:14px;
+}
 
 .dynamic-wrapper {
     width:100%;
     height:100%;
     overflow:auto;
     background:#fff;
+    position:relative;
     .dynamic-main{
         flex:1;
         display:flex;
@@ -234,7 +306,8 @@ export default {
             width:500px;
             margin:30px 0px;
             padding:10px 0px;
-            background:rgba(61, 61, 61,.9); 
+            background:rgba(61, 61, 61,.9);
+            border-radius:5px;
             animation: dynamicList 1s ease-out;
             -moz-animation: dynamicList 1s ease;
             -webkit-animation: dynamicList 1s ease;
@@ -244,12 +317,13 @@ export default {
                 flex-direction:column;
                 .dynamic-item{
                     display:flex;
-                    margin:10px 20px;
+                    flex-direction:column;
+                    padding:5px 10px;
                     border-bottom:2px solid rgba(61, 61, 61,1);
                     .left{
                         display:flex;
                         flex-direction:column;
-                        margin:10px 0px;
+                        margin:5px 0px;
                         padding:0px 10px;
                         border-right: 1px solid rgba(61, 61, 61,1);
                         .info-userAvatar{
@@ -274,7 +348,7 @@ export default {
                         display:flex;
                         flex-direction:column;
                         justify-content:space-between;
-                        margin:10px 0px;
+                        margin:5px 0px;
                         padding:0px 10px;
                         .dynamic-content{
                             font-size:12px;
@@ -293,8 +367,40 @@ export default {
                             }
                         }
                     }
+                    .bottom{
+                        display:flex;
+                        align-items:center;
+                        background:rgba(255, 255, 255,.2);
+                        padding:5px;
+                        border-radius:5px;
+                        color:#fff;
+                        .bottom-btn{
+                            flex:1;
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            cursor:pointer;
+                        }
+                    }
                 }
             }       
+        }
+    }
+    .dynamic-toTop{
+        position:fixed;
+        bottom:30px;
+        right:20px;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        padding:10px;
+        border-radius:50%;
+        background:rgba(61, 61, 61,.5);
+        color:#fff;
+        transition:all .2s linear;
+        cursor:pointer;
+        &:hover{
+            color:#000;
         }
     }
 }
@@ -317,6 +423,33 @@ export default {
     -webkit-border-radius: 10em;
     -moz-border-radius: 10em;
     border-radius: 10em;
+}
+
+/deep/ .el-textarea__inner::-webkit-scrollbar {
+    width: 3px;
+    margin:2px;
+    height: 5px;
+}
+/deep/ .el-textarea__inner::-webkit-scrollbar-button {
+    display: none;
+}
+/deep/ .el-textarea__inner::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+/deep/ .el-textarea__inner::-webkit-scrollbar-thumb {
+    width: 1px;
+    background: linear-gradient(to right top, #f12711, #f5af19);
+    -webkit-border-radius: 10em;
+    -moz-border-radius: 10em;
+    border-radius: 20em;
+}
+
+// 进去/离开动画
+.toTop-fade-enter-active, .toTop-fade-leave-active {
+    transition: all .5s;
+}
+.toTop-fade-enter, .toTop-fade-leave-active {
+    opacity:0;
 }
 
 

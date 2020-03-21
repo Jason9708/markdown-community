@@ -220,7 +220,6 @@ export default {
             width:80px;
             height:80px;
             border-radius:50%;
-            border:4px solid #ffbe76;
             opacity:1;
         }
         .side-scale{
