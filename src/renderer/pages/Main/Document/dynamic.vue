@@ -53,8 +53,49 @@
                         </div>
                         <div class='bottom'>
                             <div class='bottom-btn' style='border-right:2px solid rgba(61, 61, 61,.5);'><i class='icon-like' style='margin-right:5px;'></i></div>
-                            <div class='bottom-btn'><i class='icon-comment' style='margin-right:5px;'></i></div>
+                            <div class='bottom-btn'><i class='icon-comment' style='margin-right:5px;' @click='handleComment(index,item)'></i></div>
                             <div class='bottom-btn' v-if='item.createUserId == currentLoginUserId' style='border-left:2px solid rgba(61, 61, 61,.5);'><i class='icon-delete' style='margin-right:5px;' @click='deleteDynamicById(item)'></i></div>
+                        </div>
+                        <!-- 评论 -->
+                        <div class='comment-box' v-if='item.showComment'>
+                            <div class='mainComment-input'>
+                                <img class='comment-user-avatar' :src='currentLoginUser.avatar ? global.avatarPath + currentLoginUser.avatar : default_headPic'>
+                                <input class='comment-input' v-model='commentText' placeholder='输入评论...' maxlength="50"></input>
+                                <button class='comment-btn'  :disabled="commentText != '' ? false : true" @click='postMainComment(item)'>
+                                    send
+                                </button>
+                            </div>
+                            <!-- 评论列表 -->
+                            <div class='mainComment-list'>
+                                <div class='mainComment-item' v-for='(item, index) in commentList' :key='index'>
+                                    <div class='top'>
+                                        <img class='comment-user-avatar' :src='item.avatar ? global.avatarPath + item.avatar : default_headPic'>
+                                        <div class='comment-content'>
+                                            <span style='display:flex;align-items:center;font-size:11px;cursor:pointer' @click='goPersonDetail(item.user)'>{{item.name}}<span style='font-size:10px;margin-left:10px;color:#A4AEA8;'>{{item.date | timeFormat}}</span></span>
+                                            <div style='margin-top:5px;font-size:12px;'>
+                                                {{item.text}}
+                                            </div>
+                                        </div>
+                                        <div class='reply-btn' @click='openCommentDialog(item)'>
+                                            回复
+                                        </div>
+                                    </div>
+                                    <div class='sonComment-list' v-if='item.comments.length != 0'>
+                                        <div class='sonComment-item' v-for='(sonItem, index) in item.comments' :key='index'>
+                                            <img class='comment-user-avatar' :src='sonItem.avatar ? global.avatarPath + sonItem.avatar : default_headPic'>
+                                            <div class='comment-content'>
+                                                <span style='display:flex;align-items:center;font-size:11px;cursor:pointer' @click='goPersonDetail(sonItem.user)'>{{sonItem.name}}<span style='font-size:10px;margin-left:10px;color:#A4AEA8;'>{{sonItem.date | timeFormat}}</span></span>
+                                                <div style='margin-top:5px;font-size:12px;'>
+                                                    <span style='margin-right:5px;color:#A4AEA8;'>@{{sonItem.replyerName}}</span>{{sonItem.text}}
+                                                </div>
+                                            </div>
+                                            <div class='reply-btn' @click='openCommentDialog(item, sonItem)'>
+                                                回复
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -64,19 +105,30 @@
             <div class='dynamic-toTop' v-show='showToTop' @click='goToTop'>
                 <i class='icon-top'></i>
             </div>
-        </transition>   
+        </transition> 
+
+        <!-- 评论弹窗 -->
+        <el-dialog
+            title="Reply"
+            :visible.sync="showCommentDialog"
+            width="30%"
+            :before-close="handleCommentDialogClose">
+            <textarea class='dialog-input' v-model='sonCommentText' placeholder='输入评论...' maxlength="50"></textarea>
+            <button class='comment-btn' @click='postSonComment'>回复</button>
+        </el-dialog>  
     </div>
 </template>
 
 <script>
 import uploadImg from '../../../components/Uploadimg'
-import { postDynamic, getDynamic, deleteDynamic } from '../../../Api/api.js'
+import { postDynamic, getDynamic, deleteDynamic, getDynamicComment, sendDynamicMainComment, sendDynamicSonComment } from '../../../Api/api.js'
 export default {
     name:'Dynamic',
     data(){
         return{
             default_headPic:require('../../../assets/images/default_headPic.jpg'),
             currentLoginUserId:sessionStorage.getItem('currentUserInfo') ? JSON.parse(sessionStorage.getItem('currentUserInfo'))._id : '',
+            currentLoginUser:sessionStorage.getItem('currentUserInfo') ? JSON.parse(sessionStorage.getItem('currentUserInfo')) : '',
             // 头像上传配置
             uploadUrl:'', // 上传地址
             acceptType:'.jpg,.jpeg,.png',
@@ -89,7 +141,15 @@ export default {
             content:'',
 
             // 显示回顶按钮
-            showToTop:false
+            showToTop:false,
+
+            // 评论配置
+            commentText:'', // 主评论内容
+            sonCommentText:'', // 子评论内容
+            commentList:[], // 评论列表
+            currentMainCommentItem:'', // 当前主评论信息
+            currentSonCommentItem:'', // 当前自评论信息
+            showCommentDialog:false,
         }
     },
     components:{
@@ -108,6 +168,7 @@ export default {
         })
     },
     methods:{
+        // 上传回调
         handleChanged(file, fileList){
             this.imgList = fileList
         },
@@ -133,6 +194,9 @@ export default {
                 console.log('获取动态列表：', res)
                 if(res.data.code == 0){
                     this.dynamicList = res.data.data
+                    this.dynamicList.forEach(item => {
+                        this.$set(item, 'showComment', false)
+                    })
                 }else{
                     this.$notify({
                         title: 'Tips',
@@ -143,6 +207,7 @@ export default {
                 }
             })
         },
+        // 跳转人物详情
         goPersonDetail(id){
             this.$router.push({
                 path:'/personDetail',
@@ -179,11 +244,130 @@ export default {
                 }
             })
         },
+        // 删除动态
         deleteDynamicById(item){
             deleteDynamic(item._id).then(res => {
                 console.log('删除动态：',res)
                 if(res.data.code == 0){
                     this.getDynamicList()
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
+            })
+        },
+        // 控制评论显示
+        handleComment(index, item){
+            this.dynamicList.forEach((item, i) => {
+                if(i != index){
+                    item.showComment = false
+                }
+            })
+            this.commentText = ''
+            this.commentList = []
+            this.dynamicList[index].showComment = !this.dynamicList[index].showComment
+            if(this.dynamicList[index].showComment){
+                console.log(item)
+                this.getCommentList(item)
+            }
+        },
+        // 获取评论列表
+        getCommentList(item){
+            return getDynamicComment(item._id).then(res => {
+                console.log('获取评论列表：', res)
+                if(res.data.code == 0){
+                    this.commentList = res.data.data
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
+            })
+        },
+        postMainComment(item){
+            if(!sessionStorage.getItem('currentUserInfo')){
+                this.$notify({
+                    title: 'Tips',
+                    message: '评论请先登录！',
+                    type: 'error',
+                    duration:3000
+                })
+                return
+            }
+
+            var data = {
+                id: item._id,
+                text: this.commentText
+            }
+
+            sendDynamicMainComment(data).then( res => {
+                console.log('发布动态主评论:', res)
+                if(res.data.code == 0){
+                    this.commentText = ''
+                    this.getCommentList(item)
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
+            })
+        },
+        // 控制回复按钮
+        openCommentDialog(item,sonItem){
+            if(!sessionStorage.getItem('currentUserInfo')){
+                this.$notify({
+                    title: 'Tips',
+                    message: '评论请先登录！',
+                    type: 'error',
+                    duration:3000
+                })
+                return
+            }
+            
+            this.currentMainCommentItem = item
+            if(sonItem){
+                this.currentSonCommentItem = sonItem
+            }
+            this.showCommentDialog = true
+            console.log(this.currentMainCommentItem, this.currentSonCommentItem)
+        },
+        handleCommentDialogClose(){
+            this.sonCommentText = ''
+            this.currentDynamic = ''
+            this.currentMainCommentItem = ''
+            this.currentSonCommentItem = ''
+            this.showCommentDialog = false
+        },
+        postSonComment(){
+            var id = this.currentMainCommentItem._id
+            var data = {
+                text: this.sonCommentText,
+            }
+            if(this.currentSonCommentItem != ''){
+                data.replyerId = this.currentSonCommentItem.user
+            }else{
+                data.replyerId = this.currentMainCommentItem.user
+            }
+
+            sendDynamicSonComment(id,data).then(res => {
+                console.log('发送动态子评论:', res)
+                if(res.data.code == 0){
+                    var item = {
+                        _id:this.currentMainCommentItem.dynamic
+                    }
+                    this.getCommentList(item).then( () => {
+                        this.handleCommentDialogClose()
+                    })
                 }else{
                     this.$notify({
                         title: 'Tips',
@@ -382,6 +566,115 @@ export default {
                             cursor:pointer;
                         }
                     }
+                    .comment-box{
+                        margin-top:5px;
+                        display:flex;
+                        flex-direction:column;
+                        .mainComment-input{
+                            display:flex;
+                            padding:5px;
+                            border-radius:5px;
+                            align-items:center;
+                            background:rgba(255, 255, 255,.2);
+                            font-size:12px;
+                            .comment-user-avatar{
+                                height:30px;
+                                width:30px;
+                                border-radius:50%;
+                                margin-right:10px;
+                            }
+                            .comment-input{
+                                flex:1;
+                                height:15px;
+                                padding:5px 10px;
+                                border:0px;
+                                border-radius:5px 0 0 5px;
+                                background:rgba(61, 61, 61,.9);
+                                color:#fff;
+                            }
+                            .comment-btn{
+                                padding:7px;
+                                border-radius:0 5px 5px 0;
+                                border:0px;
+                                color:#fff;
+                                background:#E6A23C;
+                                font-size:11px;
+                                cursor:pointer;
+                                &:disabled{
+                                    background:rgba(250, 130, 49,.2);
+                                    cursor:not-allowed
+                                }
+                            }
+                        }
+                        .mainComment-list{
+                            margin-top:5px;
+                            display:flex;
+                            flex-direction:column;
+                            .mainComment-item{
+                                display:flex;
+                                flex-direction:column;
+                                margin:5px 5px 5px 40px;
+                                .top{
+                                    display:flex;
+                                    align-item:center;
+                                    .comment-user-avatar{
+                                        height:30px;
+                                        width:30px;
+                                        border-radius:50%;
+                                        margin-right:10px;
+                                    }
+                                    .comment-content{
+                                        flex:1;
+                                        display:flex;
+                                        flex-direction:column;
+                                        color:#fff;
+                                    }
+                                    .reply-btn{
+                                        font-size:10px;
+                                        align-self:flex-end;
+                                        color:rgba(255, 255, 255,.2);
+                                        cursor:pointer;
+                                        transition:all .2s linear;
+                                        &:hover{
+                                            color:#fff;
+                                        }
+                                    }
+                                }
+                                .sonComment-list{
+                                    display:flex;
+                                    flex-direction:column;
+                                    margin:5px 5px 5px 40px;
+                                    background:rgba(255, 255, 255,.1);
+                                    .sonComment-item{
+                                        display:flex;
+                                        padding:10px;
+                                        .comment-user-avatar{
+                                            height:30px;
+                                            width:30px;
+                                            border-radius:50%;
+                                            margin-right:10px;
+                                        }
+                                        .comment-content{
+                                            flex:1;
+                                            display:flex;
+                                            flex-direction:column;
+                                            color:#fff;
+                                        }
+                                        .reply-btn{
+                                            font-size:10px;
+                                            align-self:flex-end;
+                                            color:rgba(255, 255, 255,.2);
+                                            cursor:pointer;
+                                            transition:all .2s linear;
+                                            &:hover{
+                                                color:#fff;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }       
         }
@@ -401,6 +694,51 @@ export default {
         cursor:pointer;
         &:hover{
             color:#000;
+        }
+    }
+
+        // 弹窗样式
+    /deep/ .el-dialog{
+        .el-dialog__header{
+            padding:15px 15px 10px 15px;
+        }
+        .el-dialog__title{
+            font-size:16px;
+            font-weight:700;
+            font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+            color:rgb(114, 119, 123);
+        }
+        .el-dialog__body{
+            padding:10px 15px;
+            display:flex;
+            flex-direction:column;
+        }
+        .dialog-input{
+            height:70px;
+            padding:10px;
+            border:1px solid rgba(178,186,194,.15);
+            border-radius:2px;
+            color: #303952;
+            outline:none;
+            resize: none;
+            transition:all .2s linear;
+            &:focus{
+                border-color:#f0932b;
+            }
+        }
+        .comment-btn{
+            background:rgba(243, 156, 18,.6);
+            margin-top:10px;
+            padding:5px 8px;
+            border:0px;
+            border-radius:2px;
+            color:#fff;
+            font-size:11px;
+            cursor:pointer;
+            transition:all .2s linear;
+            &:hover{
+                background:rgba(243, 156, 18,1.0);
+            }
         }
     }
 }

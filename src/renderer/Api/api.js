@@ -270,15 +270,46 @@ export function postDynamic(data) {
         method: 'post'
     })
 }
+
 export function getDynamic() {
     return Axios({
         url: '/hdgc/dynamic',
         method: 'get'
     })
 }
+
 export function deleteDynamic(id) {
     return Axios({
         url: `/hdgc/dynamic/${id}`,
         method: 'delete'
+    })
+}
+
+/**
+ * about dynamicComment
+ * @getDynamicComment 根据id获取动态评论列表
+ * @sendDynamicMainComment 为某动态添加主评论
+ * @sendDynamicSonComment 为某动态添加子自评论
+ */
+export function getDynamicComment(id) {
+    return Axios({
+        url: `/hdgc/dynamicComment/${id}`,
+        method: 'get'
+    })
+}
+
+export function sendDynamicMainComment(data) {
+    return Axios({
+        url: '/hdgc/dynamicComment/',
+        data: data,
+        method: 'post'
+    })
+}
+
+export function sendDynamicSonComment(id, data) {
+    return Axios({
+        url: `/hdgc/dynamicComment/comment/${id}`,
+        data: data,
+        method: 'post'
     })
 }
