@@ -2,7 +2,7 @@
     <div class='main-wrapper'>
         <!-- 侧边栏 -->
         <div class='side-bar'>
-            <img class='avator' :src="Avatar ? global.avatarPath + Avatar : default_headPic" />
+            <img class='avator' :src="Avatar ? global.avatarPath + Avatar + '?t=' + Math.random() : default_headPic" />
             <!-- 缩小侧边栏 -->
             <div class='side-scale' @click='scale'>
                 <i class='icon-left'></i>
@@ -21,7 +21,7 @@
                     <i class='icon-write'></i>
                     <span style='margin-top:10px;'>Edtior</span>
                 </div>
-                <div class='btn' :class="$route.path === '/document'? 'active' : ''" @click="transLink('Dynamic')">
+                <div class='btn' :class="$route.path === '/dynamic'? 'active' : ''" @click="transLink('Dynamic')">
                     <i class='icon-template'></i>
                     <span style='margin-top:10px;'>Dynamic</span>
                 </div>

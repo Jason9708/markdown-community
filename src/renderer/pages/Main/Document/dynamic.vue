@@ -28,7 +28,7 @@
             </div>
             <!-- 动态列表 -->
             <div class='dynamic-box'>
-                <div class='dynamic-list'>
+                <div class='dynamic-list' v-if='dynamicList.length != 0'>
                     <div class='dynamic-item' v-for='(item,index) in dynamicList' :key='index'>
                         <div style='display:flex;'>
                             <div class='left'>
@@ -52,7 +52,7 @@
                             </div>
                         </div>
                         <div class='bottom'>
-                            <div class='bottom-btn' style='border-right:2px solid rgba(61, 61, 61,.5);'><i class='icon-like' style='margin-right:5px;'></i></div>
+                            <div class='bottom-btn' style='border-right:2px solid rgba(61, 61, 61,.5);'><i class='icon-like'  :class="isLike(item) ? 'is-like' : ''" @click.stop='isLike(item) ? cancelLike(item,index) : giveLike(item,index)' style='margin-right:5px;display:flex;align-items:center;'><span style='margin-left:5px;font-size:10px;'>{{item.like}}</span></i></div>
                             <div class='bottom-btn'><i class='icon-comment' style='margin-right:5px;' @click='handleComment(index,item)'></i></div>
                             <div class='bottom-btn' v-if='item.createUserId == currentLoginUserId' style='border-left:2px solid rgba(61, 61, 61,.5);'><i class='icon-delete' style='margin-right:5px;' @click='deleteDynamicById(item)'></i></div>
                         </div>
@@ -121,7 +121,7 @@
 
 <script>
 import uploadImg from '../../../components/Uploadimg'
-import { postDynamic, getDynamic, deleteDynamic, getDynamicComment, sendDynamicMainComment, sendDynamicSonComment } from '../../../Api/api.js'
+import { postDynamic, getDynamic, deleteDynamic, getDynamicComment, sendDynamicMainComment, sendDynamicSonComment, postDynamicLike, deleteDyanamicLike, getUserDynamicLike } from '../../../Api/api.js'
 export default {
     name:'Dynamic',
     data(){
@@ -150,13 +150,32 @@ export default {
             currentMainCommentItem:'', // 当前主评论信息
             currentSonCommentItem:'', // 当前自评论信息
             showCommentDialog:false,
+
+
+            // 点赞配置
+            userlikeArray:[]
         }
     },
     components:{
         uploadImg
     },
+    computed:{
+        isLike(){
+            return function (item) {
+                for(let i = 0; i < this.userlikeArray.length; i++){
+                    if(this.userlikeArray[i].dynamic == item._id){
+                        return true
+                    }
+                }
+                return false
+            }
+        }
+    },
     mounted(){
         this.getDynamicList()
+        if(this.currentLoginUserId != ''){
+            this.getUserDynamicLikeList()
+        }
         var ele = document.getElementsByClassName('dynamic-wrapper')[0]
         var self = this
         ele.addEventListener("scroll", function (e) {
@@ -291,6 +310,7 @@ export default {
                 }
             })
         },
+        // 发布主评论
         postMainComment(item){
             if(!sessionStorage.getItem('currentUserInfo')){
                 this.$notify({
@@ -341,6 +361,7 @@ export default {
             this.showCommentDialog = true
             console.log(this.currentMainCommentItem, this.currentSonCommentItem)
         },
+        // 评论弹窗关闭回调
         handleCommentDialogClose(){
             this.sonCommentText = ''
             this.currentDynamic = ''
@@ -348,6 +369,7 @@ export default {
             this.currentSonCommentItem = ''
             this.showCommentDialog = false
         },
+        // 发布子评论
         postSonComment(){
             var id = this.currentMainCommentItem._id
             var data = {
@@ -368,6 +390,82 @@ export default {
                     this.getCommentList(item).then( () => {
                         this.handleCommentDialogClose()
                     })
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
+            })
+        },
+        // 获取当前登录用户的点赞列表
+        getUserDynamicLikeList(){
+            getUserDynamicLike(this.currentLoginUserId).then(res => {
+                console.log('获取当前登录用户的点赞列表:',res)
+                if(res.data.code == 0){
+                    this.userlikeArray = res.data.data
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: '评论请先登录！',
+                        type: 'error',
+                        duration:3000
+                    })
+                }
+            })
+        },
+        // 点赞
+        giveLike(item, index){
+            if(!sessionStorage.getItem('currentUserInfo')){
+                this.$notify({
+                    title: 'Tips',
+                    message: '评论请先登录！',
+                    type: 'error',
+                    duration:3000
+                })
+                return
+            }
+
+            var data = {
+                id:item._id
+            }
+            postDynamicLike(data).then( res => {
+                console.log('为动态点赞:',res)
+                if(res.data.code == 0){
+                    this.dynamicList[index].like++
+                    this.getUserDynamicLikeList()
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
+            })
+        },
+        // 取消点赞
+        cancelLike(item, index){
+            if(!sessionStorage.getItem('currentUserInfo')){
+                this.$notify({
+                    title: 'Tips',
+                    message: '评论请先登录！',
+                    type: 'error',
+                    duration:3000
+                })
+                return
+            }
+
+            var data = {
+                id:item._id
+            }
+            deleteDyanamicLike(data).then( res => {
+                console.log('为动态取消点赞:',res)
+                if(res.data.code == 0){
+                    this.dynamicList[index].like--
+                    this.getUserDynamicLikeList()
                 }else{
                     this.$notify({
                         title: 'Tips',
@@ -400,6 +498,9 @@ export default {
 .icon-like:before {
     content: '\e61e';
     font-size:14px;
+}
+.is-like{
+    color:#2ecc71;
 }
 .icon-delete:before{
     content: '\e645';
@@ -521,10 +622,9 @@ export default {
                             font-size:12px;
                             display:flex;
                             flex-direction:column;
-                            .info-user-backdrop{
+                            .info-user-name{
                                 display:flex;
-                                flex-direction:column;
-                                font-size:10px;
+                                justify-content:center;
                             }
                         }
                     }

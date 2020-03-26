@@ -14,7 +14,7 @@
                     <i class='icon-search' style='position:absolute;top:5px;right:5px;cursor:pointer;' @click.stop='showSearchBox = true'></i>
                     <!-- 个人主要信息：头像、昵称、签名 -->
                     <div class='main'>
-                        <img class='avator' :src="userInfo.avatar ? global.avatarPath + userInfo.avatar : default_headPic"></img>
+                        <img class='avator' :src="userInfo.avatar ? global.avatarPath + userInfo.avatar + '?t=' + Math.random() : default_headPic"></img>
                         <div class='info'>
                             <span class='name'>{{userInfo.nickname !='' ? userInfo.nickname : userInfo.username}}</span>
                             <span class='intro'>{{userInfo.intro}}</span>
@@ -86,7 +86,7 @@
         <el-divider content-position="left">Hot Article</el-divider>
         <!-- 热门文章走马灯 -->
         <div class='Home-carousel'>
-            <el-carousel :interval="5000" type="card" height="250px">
+            <el-carousel :interval="5000" type="card" height="250px" v-if='hotArticleList.length != 0'>
                 <el-carousel-item v-for="(item,index) in hotArticleList" :key="index">
                     <div class='carousel-box' @click='goArticleDetail(item)'>
                         <img :src="item.coverPic ? global.articleCoverPath + item.coverPic : default_cover ">
@@ -104,6 +104,9 @@
                     </div>
                 </el-carousel-item>
             </el-carousel>
+            <div style='display:flex;justify-content:center;align-items:center;margin-top:100px;' v-else>
+                <i class='icon-empty'></i>
+            </div>
         </div>
         <!-- 搜索框 -->
         <transition name='fade'>
@@ -118,7 +121,7 @@
                 <!-- 用户 -->
                 <div class='searchData-user-box' v-if='searchUserList.length > 0' >
                     <div class='user-item' v-for='(item, index) in searchUserList' :key='index' @click='goPersonDetail(item._id)'>
-                        <img class='avator' :src="userInfo.avatar ? global.avatarPath + item.avatar : default_headPic"></img>
+                        <img class='avator' :src="userInfo.avatar ? global.avatarPath + item.avatar + '?t=' + Math.random() : default_headPic"></img>
                         <span style='margin-top:10px;'>{{item.nickname}}</span>
                     </div>
                 </div>
@@ -146,6 +149,7 @@ export default {
         return{
             default_headPic:require('../../assets/images/default_headPic.jpg'),
             default_cover:require('../../assets/images/default_cover.png'),
+            no_content:require('../../assets/images/no_content.jpg'),
             keyWord:'', // 搜索值
             searchUserList:[], // 搜索所得用户列表
             searchArticleList:[], // 搜索所得文章列表
@@ -570,6 +574,10 @@ export default {
 }
 .icon-close:hover {
     color:rgba(87, 101, 116,1.0);
+}
+.icon-empty:before{
+    content:'\e708';
+    font-size:20px;
 }
 
 // css style

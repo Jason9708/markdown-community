@@ -219,6 +219,7 @@ export function sendSonComment(id, data) {
  *      id 文章id
  * @deleteLike 为某文章取消点赞
  *      id 文章id
+ * @getUserLike 获取用户点赞文章
  */
 
 export function postLike(data) {
@@ -311,5 +312,36 @@ export function sendDynamicSonComment(id, data) {
         url: `/hdgc/dynamicComment/comment/${id}`,
         data: data,
         method: 'post'
+    })
+}
+
+/**
+ * about dynamicLike
+ * @postDynamicLike 为某动态添加点赞
+ *      id 动态id
+ * @deleteDyanamicLike 为某动态取消点赞
+ *      id 动态id
+ * @getUserDynamicLike 获取用户点赞动态
+ */
+export function postDynamicLike(data) {
+    return Axios({
+        url: '/hdgc/dynamicLike/',
+        data: data,
+        method: 'post'
+    })
+}
+
+export function deleteDyanamicLike(data) {
+    return Axios({
+        url: 'hdgc/dynamicLike/unlike',
+        data: data,
+        method: 'post'
+    })
+}
+
+export function getUserDynamicLike(id) {
+    return Axios({
+        url: `hdgc/dynamicLike/userlike/${id}`,
+        method: 'get'
     })
 }
