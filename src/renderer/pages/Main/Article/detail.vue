@@ -214,6 +214,7 @@ export default {
                         duration:3000
                     })
                 }
+                this.commentText = ''
             })
         },
         openCommentDialog:function(item,sonItem){
