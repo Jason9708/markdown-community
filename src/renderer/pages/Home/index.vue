@@ -28,11 +28,22 @@
                         <span style='display:flex;align-items:center;padding:5px;'><i class='icon-wechat'></i>{{userInfo.wechat}}</span>
                     </div>
                 </div>
-                <!-- 网站 -->
-                <div class='internet-box' v-if='isLogin'>
-                    <i class='icon-weibo' @click="userInfo.weibo !='' ? openUrl(userInfo.weibo) : ''"></i>
-                    <i class='icon-internet' @click="userInfo.internet !='' ? openUrl(userInfo.internet) : ''"></i>
-                    <i class='icon-github' @click="userInfo.github !='' ? openUrl(userInfo.github) : ''"></i>
+                <!-- 网站 + 通知 -->
+                <div style='display:flex;flex-direction:column;align-items:center;margin-left:15px;' v-if='isLogin'>
+                    <!-- 通知 -->
+                    <div class='notice-box'>
+                        <el-badge :hidden='noticeList.length === 0' :value="noticeList.length">
+                            <div class='notice-btn'>
+                                <i class='icon-notice'></i>
+                            </div>
+                        </el-badge>
+                    </div>
+                    <!-- 网站 -->
+                    <div class='internet-box'>
+                        <i class='icon-weibo' @click="userInfo.weibo !='' ? openUrl(userInfo.weibo) : ''"></i>
+                        <i class='icon-internet' @click="userInfo.internet !='' ? openUrl(userInfo.internet) : ''"></i>
+                        <i class='icon-github' @click="userInfo.github !='' ? openUrl(userInfo.github) : ''"></i>
+                    </div>
                 </div>
                 <!-- login -->
                 <div class='login-box' v-if='!isLogin && !showRegister'>
@@ -171,7 +182,10 @@ export default {
             showRegister:false,
 
             // 控制按钮加载
-            btnLoading:false
+            btnLoading:false,
+
+            // 通知配置
+            noticeList:[]
         }
     },
     computed:{
@@ -579,6 +593,11 @@ export default {
     content:'\e708';
     font-size:20px;
 }
+.icon-notice:before{
+    content:'\e622';
+    font-size:20px;
+}
+
 
 // css style
 .Home-wrapper{
@@ -794,13 +813,29 @@ export default {
                     }
                 }
             }
+            .notice-box{
+                margin-bottom:10px;
+                .notice-btn{
+                    display:flex;
+                    flex-direction:column;
+                    justify-content:center;
+                    background:#fff;
+                    border-radius:8px;
+                    box-shadow:0 0 10px -10px #000;
+                    padding:10px;
+                    cursor:pointer;
+                    transition:all .2s linear;
+                    &:hover{
+                        background:#ecf0f1;
+                    }
+                }
+            }
             .internet-box{
                 display:flex;
                 flex-direction:column;
                 justify-content:center;
                 align-items:center;
                 height:100px;
-                margin-left:15px;
                 background:#fff;
                 border-radius:8px;
                 box-shadow:0 0 10px -10px #000;
