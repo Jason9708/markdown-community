@@ -33,10 +33,39 @@
                     <!-- 通知 -->
                     <div class='notice-box'>
                         <el-badge :hidden='noticeList.length === 0' :value="noticeList.length">
-                            <div class='notice-btn'>
+                            <div class='notice-btn' @click='showNoticeBox = true'>
                                 <i class='icon-notice'></i>
                             </div>
                         </el-badge>
+                        <!-- 通知盒子 -->
+                        <transition name='notice-box-fade'>
+                            <div class='notice-container' v-if='showNoticeBox'>
+                                <div class='notice-container-nav'>
+                                    <div class='nav-item' :class="currentNoticeType == 1 ? 'is-active' : ''" @click='handleNoticeType(1)'>
+                                        <i class='icon-comment'></i>
+                                    </div>
+                                    <div class='nav-item' :class="currentNoticeType == 2 ? 'is-active' : ''" @click='handleNoticeType(2)'>
+                                        <i class='icon-like'></i>
+                                    </div>
+                                    <div class='nav-item' :class="currentNoticeType == 3 ? 'is-active' : ''" @click='handleNoticeType(3)'>
+                                        <i class='icon-follow'></i>
+                                    </div>
+                                </div>
+                                <div class='notice-container-list'>
+                                    <div class='notice-container-item' v-for='(item, index) in displayNoticeList' :key='index' @click.stop='clickNoticeItem(index)'>
+                                        <div class='item-comment' v-if="item.type == '1' || item.type == '3' || item.type == '4' || item.type == '6'">
+                                            <span style='color:#e67e22;margin-right:5px;'>{{item.userName}}</span>评论了你：<span style='color:#e67e22;'>{{item.content}}</span>
+                                        </div>
+                                        <div class='item-like' v-if="item.type == '2' || item.type == '5'">
+                                            <span style='color:#e67e22;margin-right:5px;'>{{item.userName}}</span>点赞了你 - <span style='color:#e67e22;'>{{item.type == '2' ? item.info.title : item.info.content}}</span>
+                                        </div>
+                                        <div class='item-like' v-if="item.type == '7'">
+                                            <span style='color:#e67e22;margin-right:5px;'>{{item.userName}}</span>关注了你
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </transition>
                     </div>
                     <!-- 网站 -->
                     <div class='internet-box'>
@@ -152,7 +181,7 @@
 </template>
 
 <script>
-import { userRegister, userLogin, getUserInfo, getHotArticleList, searchData } from '../../Api/api.js'
+import { userRegister, userLogin, getUserInfo, getHotArticleList, searchData, getUserNotice } from '../../Api/api.js'
 import anime from 'animejs'
 export default {
     name:'Home',
@@ -180,12 +209,15 @@ export default {
             showSearchBox:false,
             showSearchData:false,
             showRegister:false,
+            showNoticeBox:false,
 
             // 控制按钮加载
             btnLoading:false,
 
             // 通知配置
-            noticeList:[]
+            currentNoticeType:1,
+            noticeList:[], // 所有通知列表
+            displayNoticeList:[] // 当前要看的通知列表
         }
     },
     computed:{
@@ -203,6 +235,11 @@ export default {
                 if(document.querySelector('.logout-box') && document.querySelector('.logout-box').style.display == 'block'){
                     document.querySelector('.logout-box').style.display = 'none'
                 }
+            }
+            if(className != 'notice-container' && className != 'notice-btn' && className != 'icon-notice' 
+               && className != 'notice-container-nav' && className != 'nav-item' && className != 'icon-comment' 
+               && className != 'icon-like' && className != 'icon-follow' && className != 'nav-item is-active'){
+                this.showNoticeBox = false
             }
         })
         this.getHotArticles()
@@ -409,6 +446,8 @@ export default {
                    this.$store.dispatch('setUser',res.data.data)
                    this.userInfo = res.data.data
                    sessionStorage.setItem('currentUserInfo',JSON.stringify(this.userInfo))
+                   // 查询当前登录人通知列表
+                  this.getNoticeList()
                }else{
                    this.$notify({
                         title: 'Tips',
@@ -498,6 +537,49 @@ export default {
             this.searchUserList = []
             this.searchArticleList = []
             this.keyWord = ''
+        },
+        getNoticeList:function(){
+            getUserNotice().then( res => {
+                console.log('获取通知列表', res)
+                if(res.data.code == 0){
+                    this.noticeList = res.data.data.NoticeList
+                    this.displayNoticeList = this.noticeList.filter(item => {
+                        return item.type === '1' || item.type === '2' || item.type === '3'
+                    })
+                    console.log(this.displayNoticeList)
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
+            })
+        },
+        handleNoticeType:function(type){
+            if(this.currentNoticeType != type){
+                switch(type){
+                    case 1:
+                        this.displayNoticeList = this.noticeList.filter(item => {
+                            return item.type === '1' || item.type === '2' || item.type === '3'
+                        })
+                        break
+                    case 2:
+                        this.displayNoticeList = this.noticeList.filter(item => {
+                            return item.type === '4' || item.type === '5' || item.type === '6'
+                        })
+                        break
+                    case 3:
+                        this.displayNoticeList = this.noticeList.filter(item => {
+                            return item.type === '7'
+                        })
+                }
+                console.log(this.displayNoticeList)
+                this.currentNoticeType = type
+            }
+        },
+        clickNoticeItem:function(index){
         }
     }
 }
@@ -597,7 +679,18 @@ export default {
     content:'\e622';
     font-size:20px;
 }
-
+.icon-comment:before{
+    content:'\e600';
+    font-size:15px;
+}
+.icon-like:before{
+    content:'\e61e';
+    font-size:15px;
+}
+.icon-follow:before{
+    content:'\e60f';
+    font-size:13px;
+}
 
 // css style
 .Home-wrapper{
@@ -814,6 +907,7 @@ export default {
                 }
             }
             .notice-box{
+                position:relative;
                 margin-bottom:10px;
                 .notice-btn{
                     display:flex;
@@ -827,6 +921,58 @@ export default {
                     transition:all .2s linear;
                     &:hover{
                         background:#ecf0f1;
+                    }
+                }
+                .notice-container{
+                    position:absolute;
+                    top:0px;
+                    right:-360px;
+                    width:350px;
+                    max-height:400px;
+                    border-radius:5px;
+                    background:#fff;
+                    z-index:99;
+                    overflow:auto;
+                    .notice-container-nav{
+                        display:flex;
+                        align-items:center;
+                        margin:10px;
+                        padding:5px;
+                        border-radius:5px;
+                        background:#f4f5f5;
+                        .nav-item{
+                            flex:1;
+                            display:flex;
+                            justify-content:center;
+                            align-items:center;
+                            cursor:pointer;
+                            &:nth-child(2){
+                                border-left:1px solid rgba(61, 61, 61, 0.5);
+                                border-right:1px solid rgba(61, 61, 61, 0.5);
+                            }
+                        }
+                        .is-active{
+                            color:#e67e22;
+                        }
+                    }
+                    .notice-container-list{
+                        display:flex;
+                        flex-direction:column;
+                        margin:10px;
+                        .notice-container-item{
+                            padding:10px;
+                            border-bottom:1px solid rgba(178, 186, 194, 0.15);
+                            font-size:12px;
+                            cursor:pointer;
+                            transition:all .2s linear;
+                            &:hover{
+                                border-bottom:1px solid rgba(178, 186, 194, 0.9);
+                            }
+                            .item-comment{
+                                display:flex;
+                                flex-wrap:wrap;
+                            }
+                        }
                     }
                 }
             }
@@ -1017,6 +1163,14 @@ export default {
         opacity:0;
     }
 
+    // 进去/离开动画
+    .notice-box-fade-enter-active, .notice-box-fade-leave-active {
+        transition: all .5s;
+    }
+    .notice-box-fade-enter, .notice-box-fade-leave-active {
+        opacity:0;
+    }
+
 }
 
 
@@ -1044,6 +1198,27 @@ export default {
         transform:scaleX(1);
         transform:scaleY(1);
     }
+}
+
+
+// 滚动条样式覆盖
+.notice-container::-webkit-scrollbar {
+    width: 3px;
+    margin:2px;
+    height: 5px;
+}
+.notice-container::-webkit-scrollbar-button {
+    display: none;
+}
+.notice-container::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+.notice-container::-webkit-scrollbar-thumb {
+    width: 1px;
+    background: linear-gradient(to right top, #ffbe76, #f0932b);
+    -webkit-border-radius: 10em;
+    -moz-border-radius: 10em;
+    border-radius: 10em;
 }
 
 </style>

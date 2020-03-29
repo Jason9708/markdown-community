@@ -345,3 +345,14 @@ export function getUserDynamicLike(id) {
         method: 'get'
     })
 }
+
+/**
+ * about notice
+ * @getUserNotice 获取当前用户通知列表
+ */
+export function getUserNotice() {
+    return Axios({
+        url: `hdgc/notice`,
+        method: 'get'
+    })
+}
