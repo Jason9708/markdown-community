@@ -349,10 +349,19 @@ export function getUserDynamicLike(id) {
 /**
  * about notice
  * @getUserNotice 获取当前用户通知列表
+ * @deleteUserNotice 删除当前用户某一条通知
  */
 export function getUserNotice() {
     return Axios({
         url: `hdgc/notice`,
         method: 'get'
+    })
+}
+
+export function deleteUserNotice(data) {
+    return Axios({
+        url: `hdgc/notice`,
+        data: data,
+        method: 'post'
     })
 }

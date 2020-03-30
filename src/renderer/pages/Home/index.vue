@@ -40,27 +40,29 @@
                         <!-- 通知盒子 -->
                         <transition name='notice-box-fade'>
                             <div class='notice-container' v-if='showNoticeBox'>
-                                <div class='notice-container-nav'>
-                                    <div class='nav-item' :class="currentNoticeType == 1 ? 'is-active' : ''" @click='handleNoticeType(1)'>
-                                        <i class='icon-comment'></i>
-                                    </div>
-                                    <div class='nav-item' :class="currentNoticeType == 2 ? 'is-active' : ''" @click='handleNoticeType(2)'>
-                                        <i class='icon-like'></i>
-                                    </div>
-                                    <div class='nav-item' :class="currentNoticeType == 3 ? 'is-active' : ''" @click='handleNoticeType(3)'>
-                                        <i class='icon-follow'></i>
-                                    </div>
-                                </div>
-                                <div class='notice-container-list'>
-                                    <div class='notice-container-item' v-for='(item, index) in displayNoticeList' :key='index' @click.stop='clickNoticeItem(index)'>
-                                        <div class='item-comment' v-if="item.type == '1' || item.type == '3' || item.type == '4' || item.type == '6'">
-                                            <span style='color:#e67e22;margin-right:5px;'>{{item.userName}}</span>评论了你：<span style='color:#e67e22;'>{{item.content}}</span>
+                                <div class='notice-main'>
+                                    <div class='notice-container-nav'>
+                                        <div class='nav-item' :class="currentNoticeType == 1 ? 'is-active' : ''" @click='handleNoticeType(1)'>
+                                            <i class='icon-comment'></i>
                                         </div>
-                                        <div class='item-like' v-if="item.type == '2' || item.type == '5'">
-                                            <span style='color:#e67e22;margin-right:5px;'>{{item.userName}}</span>点赞了你 - <span style='color:#e67e22;'>{{item.type == '2' ? item.info.title : item.info.content}}</span>
+                                        <div class='nav-item' :class="currentNoticeType == 2 ? 'is-active' : ''" @click='handleNoticeType(2)'>
+                                            <i class='icon-like'></i>
                                         </div>
-                                        <div class='item-like' v-if="item.type == '7'">
-                                            <span style='color:#e67e22;margin-right:5px;'>{{item.userName}}</span>关注了你
+                                        <div class='nav-item' :class="currentNoticeType == 3 ? 'is-active' : ''" @click='handleNoticeType(3)'>
+                                            <i class='icon-follow'></i>
+                                        </div>
+                                    </div>
+                                    <div class='notice-container-list'>
+                                        <div class='notice-container-item' v-for='(item, index) in displayNoticeList' :key='index' @click.stop='deleteNoticeItem(item)'>
+                                            <div class='item-comment' v-if="item.type == '1' || item.type == '3' || item.type == '4' || item.type == '6'">
+                                                <span style='color:#e67e22;margin-right:5px;'>{{item.userName}}</span>评论了你：<span style='color:#e67e22;'>{{item.content}}</span>
+                                            </div>
+                                            <div class='item-like' v-if="item.type == '2' || item.type == '5'">
+                                                <span style='color:#e67e22;margin-right:5px;'>{{item.userName}}</span>点赞了你 - <span style='color:#e67e22;'>{{item.type == '2' ? item.info.title : item.info.content}}</span>
+                                            </div>
+                                            <div class='item-like' v-if="item.type == '7'">
+                                                <span style='color:#e67e22;margin-right:5px;'>{{item.userName}}</span>关注了你
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -181,7 +183,7 @@
 </template>
 
 <script>
-import { userRegister, userLogin, getUserInfo, getHotArticleList, searchData, getUserNotice } from '../../Api/api.js'
+import { userRegister, userLogin, getUserInfo, getHotArticleList, searchData, getUserNotice, deleteUserNotice } from '../../Api/api.js'
 import anime from 'animejs'
 export default {
     name:'Home',
@@ -366,6 +368,8 @@ export default {
                     this.$store.dispatch('setIsAuthenticated',true)
                     // 查询当前登录人信息
                     this.getLoginUserInfo()
+                    this.loginInfo.username = ''
+                    this.loginInfo.password = ''
                 }else{
                     this.$notify({
                         title: 'Tips',
@@ -501,8 +505,9 @@ export default {
             ele.style.display = 'block'
         },
         logoutEvent:function(){
-            console.log('hhh')
-            this.$router.go(0)
+            sessionStorage.clear()
+            localStorage.clear()
+            this.$store.dispatch('clearCurrentState')
         },
         search:function(){
             if(this.keyWord == ''){
@@ -543,10 +548,24 @@ export default {
                 console.log('获取通知列表', res)
                 if(res.data.code == 0){
                     this.noticeList = res.data.data.NoticeList
-                    this.displayNoticeList = this.noticeList.filter(item => {
-                        return item.type === '1' || item.type === '2' || item.type === '3'
-                    })
-                    console.log(this.displayNoticeList)
+
+                    switch(this.currentNoticeType){
+                        case 1:
+                            this.displayNoticeList = this.noticeList.filter(item => {
+                                return item.type === '1' || item.type === '3' || item.type === '4' || item.type === '6'
+                            })
+                            break
+                        case 2:
+                            this.displayNoticeList = this.noticeList.filter(item => {
+                                return item.type === '2' || item.type === '5'
+                            })
+                            break
+                        case 3:
+                            this.displayNoticeList = this.noticeList.filter(item => {
+                                return item.type === '7'
+                            })
+                    }
+
                 }else{
                     this.$notify({
                         title: 'Tips',
@@ -562,12 +581,12 @@ export default {
                 switch(type){
                     case 1:
                         this.displayNoticeList = this.noticeList.filter(item => {
-                            return item.type === '1' || item.type === '2' || item.type === '3'
+                            return item.type === '1' || item.type === '3' || item.type === '4' || item.type === '6'
                         })
                         break
                     case 2:
                         this.displayNoticeList = this.noticeList.filter(item => {
-                            return item.type === '4' || item.type === '5' || item.type === '6'
+                            return item.type === '2' || item.type === '5'
                         })
                         break
                     case 3:
@@ -575,11 +594,31 @@ export default {
                             return item.type === '7'
                         })
                 }
-                console.log(this.displayNoticeList)
+
                 this.currentNoticeType = type
             }
         },
         clickNoticeItem:function(index){
+            
+        },
+        deleteNoticeItem:function(item){
+            var data = {
+                id: item._id
+            }
+            console.log(data)
+            deleteUserNotice(data).then(res => {
+                console.log('删除用户某一条通知')
+                if(res.data.code == 0){
+                    this.getNoticeList()
+                }else{
+                    this.$notify({
+                        title: 'Tips',
+                        message: res.data.message,
+                        type: 'error',
+                        duration:3000
+                    })
+                }
+            })
         }
     }
 }
@@ -926,51 +965,64 @@ export default {
                 .notice-container{
                     position:absolute;
                     top:0px;
-                    right:-360px;
-                    width:350px;
-                    max-height:400px;
-                    border-radius:5px;
-                    background:#fff;
+                    right:-370px;
                     z-index:99;
-                    overflow:auto;
-                    .notice-container-nav{
-                        display:flex;
-                        align-items:center;
-                        margin:10px;
-                        padding:5px;
-                        border-radius:5px;
-                        background:#f4f5f5;
-                        .nav-item{
-                            flex:1;
-                            display:flex;
-                            justify-content:center;
-                            align-items:center;
-                            cursor:pointer;
-                            &:nth-child(2){
-                                border-left:1px solid rgba(61, 61, 61, 0.5);
-                                border-right:1px solid rgba(61, 61, 61, 0.5);
-                            }
-                        }
-                        .is-active{
-                            color:#e67e22;
-                        }
+                    &:before{
+                        content:'';
+                        position:absolute;
+                        top:10px;
+                        left:-20px;
+                        width:0px;
+                        height:0px;
+                        border:10px solid transparent;
+                        border-right:10px solid #fff;
                     }
-                    .notice-container-list{
-                        display:flex;
-                        flex-direction:column;
-                        margin:10px;
-                        .notice-container-item{
-                            padding:10px;
-                            border-bottom:1px solid rgba(178, 186, 194, 0.15);
-                            font-size:12px;
-                            cursor:pointer;
-                            transition:all .2s linear;
-                            &:hover{
-                                border-bottom:1px solid rgba(178, 186, 194, 0.9);
-                            }
-                            .item-comment{
+                    .notice-main{
+                        width:350px;
+                        max-height:400px;
+                        border-radius:5px;
+                        background:#fff;
+                        overflow:auto;
+
+                        .notice-container-nav{
+                            display:flex;
+                            align-items:center;
+                            margin:10px;
+                            padding:5px;
+                            border-radius:5px;
+                            background:#f4f5f5;
+                            .nav-item{
+                                flex:1;
                                 display:flex;
-                                flex-wrap:wrap;
+                                justify-content:center;
+                                align-items:center;
+                                cursor:pointer;
+                                &:nth-child(2){
+                                    border-left:1px solid rgba(61, 61, 61, 0.5);
+                                    border-right:1px solid rgba(61, 61, 61, 0.5);
+                                }
+                            }
+                            .is-active{
+                                color:#e67e22;
+                            }
+                        }
+                        .notice-container-list{
+                            display:flex;
+                            flex-direction:column;
+                            margin:10px;
+                            .notice-container-item{
+                                padding:10px;
+                                border-bottom:1px solid rgba(178, 186, 194, 0.15);
+                                font-size:12px;
+                                cursor:pointer;
+                                transition:all .2s linear;
+                                &:hover{
+                                    border-bottom:1px solid rgba(178, 186, 194, 0.9);
+                                }
+                                .item-comment{
+                                    display:flex;
+                                    flex-wrap:wrap;
+                                }
                             }
                         }
                     }
@@ -1202,18 +1254,18 @@ export default {
 
 
 // 滚动条样式覆盖
-.notice-container::-webkit-scrollbar {
+.notice-main::-webkit-scrollbar {
     width: 3px;
     margin:2px;
     height: 5px;
 }
-.notice-container::-webkit-scrollbar-button {
+.notice-main::-webkit-scrollbar-button {
     display: none;
 }
-.notice-container::-webkit-scrollbar-track {
+.notice-main::-webkit-scrollbar-track {
     background-color: transparent;
 }
-.notice-container::-webkit-scrollbar-thumb {
+.notice-main::-webkit-scrollbar-thumb {
     width: 1px;
     background: linear-gradient(to right top, #ffbe76, #f0932b);
     -webkit-border-radius: 10em;
