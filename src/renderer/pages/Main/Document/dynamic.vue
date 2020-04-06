@@ -47,7 +47,7 @@
                                     {{item.content}}
                                 </div>
                                 <div class='dynamic-img' v-if='item.images.length != 0'>
-                                    <img class='info-img' v-for='(img,index) in item.images' :key='index' :src='global.dynamicPicPath + img'>
+                                    <img class='info-img' v-for='(img,index) in item.images' :key='index' :src='global.dynamicPicPath + img'  @click='handlePreview(img)'>
                                 </div>
                             </div>
                         </div>
@@ -115,7 +115,15 @@
             :before-close="handleCommentDialogClose">
             <textarea class='dialog-input' v-model='sonCommentText' placeholder='输入评论...' maxlength="50"></textarea>
             <button class='comment-btn' @click='postSonComment'>回复</button>
-        </el-dialog>  
+        </el-dialog>
+
+        <!-- 图片附图预览弹窗 -->  
+        <el-dialog
+            title="Preview"
+            :visible.sync="showPreviewDialog"
+            :before-close="handlePreviewDialogClose">
+            <img class='preview-img' :src='global.dynamicPicPath + previewImg'>
+        </el-dialog>
     </div>
 </template>
 
@@ -129,13 +137,15 @@ export default {
             default_headPic:require('../../../assets/images/default_headPic.jpg'),
             currentLoginUserId:sessionStorage.getItem('currentUserInfo') ? JSON.parse(sessionStorage.getItem('currentUserInfo'))._id : '',
             currentLoginUser:sessionStorage.getItem('currentUserInfo') ? JSON.parse(sessionStorage.getItem('currentUserInfo')) : '',
-            // 头像上传配置
+            // 图片上传配置
             uploadUrl:'', // 上传地址
             acceptType:'.jpg,.jpeg,.png',
             limit:5,
             autoUpload:false,
             showFileList:false,
             imgList:[],
+            showPreviewDialog:false, // 图片预览弹窗
+            previewImg:'', // 当前预览图片
 
             dynamicList:[],
             content:'',
@@ -201,6 +211,13 @@ export default {
                 type: 'error',
                 duration:3000
             })
+        },
+        handlePreview(img){
+            this.previewImg = img
+            this.showPreviewDialog = true
+        },
+        handlePreviewDialogClose(){
+            this.showPreviewDialog = false
         },
         // 回到顶部
         goToTop(){
@@ -812,6 +829,9 @@ export default {
             padding:10px 15px;
             display:flex;
             flex-direction:column;
+            img{
+                max-height:400px;
+            }
         }
         .dialog-input{
             height:70px;
