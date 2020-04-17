@@ -358,6 +358,16 @@ export default {
          */
          signinClcik:function(){
             // this.loadingAnime() - 禁用
+            var reg = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?!([^(0-9a-zA-Z)])+$).{6,16}$/
+            if(!reg.test(this.loginInfo.password)){
+                this.$notify({
+                    title: 'Tips',
+                    message: '密码至少包含大小写字母，数字，下划线中的两种，且长度为6到12位',
+                    type: 'error',
+                    duration:3000
+                })
+                return
+            }
             this.btnLoading = true
             userLogin(this.loginInfo).then( res => {
                 if(res.data.code == 0){
@@ -384,6 +394,16 @@ export default {
          },
          registerClick:function(){
             // this.loadingAnime() - 禁用
+            var reg = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?!([^(0-9a-zA-Z)])+$).{6,16}$/
+            if(!reg.test(this.loginInfo.password)){
+                this.$notify({
+                    title: 'Tips',
+                    message: '密码至少包含大小写字母，数字，下划线中的两种，且长度为6到12位',
+                    type: 'error',
+                    duration:3000
+                })
+                return
+            }
             this.btnLoading = true
             userRegister(this.registerInfo).then( res => {
                 if(res.data.code == 0){
@@ -526,6 +546,15 @@ export default {
                 if(res.data.code == 0){
                     this.searchUserList = res.data.data.users
                     this.searchArticleList = res.data.data.articles
+                    if(this.searchUserList.length == 0 && this.searchArticleList == 0){
+                        this.showSearchData = false
+                        return this.$notify({
+                            title: 'Tips',
+                            message: '当前搜索无内容',
+                            type: 'warning',
+                            duration:3000
+                        })
+                    }
                     this.showSearchData = true
                 }else{
                     this.$notify({
@@ -1178,6 +1207,7 @@ export default {
                 align-items:center;
                 padding:10px;
                 font-size:11px;
+                cursor:pointer;
                 .avator{
                     width:50px;
                     height:50px;
@@ -1192,6 +1222,7 @@ export default {
             .article-item{
                 display:flex;
                 padding:10px;
+                cursor:pointer;
                 .coverPic{
                     width:100px;
                     height:60px;

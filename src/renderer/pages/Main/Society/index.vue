@@ -467,7 +467,7 @@ export default {
                 position: relative;
                 display: flex;
                 flex-direction: column;
-                margin:10px 20px;
+                margin:20px 20px;
                 border-bottom:1px solid rgba(178,186,194,.15);
                 cursor:pointer;
                 width:90%;
